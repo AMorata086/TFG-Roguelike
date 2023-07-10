@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 movementDirection;
 
     public Rigidbody2D rb;
+
+    public Animator animator;
     
     public InputActions playerControls;
     private InputAction move;
@@ -41,6 +43,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         movementDirection = move.ReadValue<Vector2>();
+
+        // change the animation according to the direction the player is moving
+        animator.SetFloat("Horizontal_movement", movementDirection.x);
+        animator.SetFloat("Vertical_movement", movementDirection.y);
+        animator.SetFloat("Speed", movementDirection.sqrMagnitude);
+
     }
 
     // FixedUpdate is called at a fixed rate, used for physics
