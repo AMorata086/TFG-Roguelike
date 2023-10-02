@@ -48,12 +48,26 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Horizontal_movement", movementDirection.x);
         animator.SetFloat("Vertical_movement", movementDirection.y);
         animator.SetFloat("Speed", movementDirection.sqrMagnitude);
+        // leave the walking animation looking at the last direction the player moved
+        if(movementDirection.x > 0)
+        {
+            animator.SetBool("looking_left", false);
+        } 
+        else if(movementDirection.x == 0 && movementDirection.y != 0)
+        {
+            animator.SetBool("looking_left", false);
+        }
+        else if(movementDirection.x < 0)
+        {
+            animator.SetBool("looking_left", true);
+        }
 
     }
 
     // FixedUpdate is called at a fixed rate, used for physics
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + movementDirection * movementSpeed * Time.fixedDeltaTime);
+        // rb.MovePosition(rb.position + movementDirection * movementSpeed * Time.fixedDeltaTime);
+        rb.velocity = movementDirection * movementSpeed;
     }
 }
