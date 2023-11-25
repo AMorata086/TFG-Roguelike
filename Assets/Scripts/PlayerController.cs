@@ -9,28 +9,97 @@ public class PlayerController : MonoBehaviour
     // variables for player movement
     public float movementSpeed = 5f;
     private Vector2 movementDirection;
+    private Vector2 mousePosition;
 
     public Rigidbody2D rb;
+
+    public GameObject hand;
+
+    public GameObject shootingPoint;
+    public GameObject bulletPrefab;
+    public float bulletSpeed;
+
+    //public Camera camera;
 
     public Animator animator;
     
     public InputActions playerControls;
-    private InputAction move;
+
+    // Cooldown controls
+    public float shootingCooldown = 0.5f;
+    private float lastShotTime = 0;
 
     private void Awake()
     {
         playerControls = new InputActions();
+        // Subscribe to the actions that are button type
+        // playerControls.Player.Attack.performed += Shoot;
+        playerControls.Player.Dodge.performed += Dodge;
     }
 
     private void OnEnable()
     {
-        move = playerControls.Player.Move;
-        move.Enable();
+        playerControls.Player.Enable();
     }
 
     private void OnDisable()
     {
-        move.Disable();
+        playerControls.Player.Disable();
+    }
+
+    private void Dodge(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /*
+    private void Shoot(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (Time.time - lastShotTime < shootingCooldown) 
+            {
+                return;
+            }
+            GameObject bullet = Instantiate(bulletPrefab, shootingPoint.transform.position, shootingPoint.transform.rotation);
+            bullet.GetComponent<Rigidbody2D>().AddForce(shootingPoint.transform.right * bulletSpeed, ForceMode2D.Impulse);
+            lastShotTime = Time.time;
+        }
+    }
+    */
+    private void Shoot()
+    {
+        if ((Time.time - lastShotTime) < shootingCooldown)
+        {
+            return;
+        }
+        GameObject bullet = Instantiate(bulletPrefab, shootingPoint.transform.position, shootingPoint.transform.rotation);
+        bullet.GetComponent<Rigidbody2D>().AddForce(shootingPoint.transform.right * bulletSpeed, ForceMode2D.Impulse);
+        lastShotTime = Time.time;
+    }
+
+    void AnimatePlayer()
+    {
+        // change the animation according to the direction the player is moving
+        animator.SetFloat("Speed", movementDirection.sqrMagnitude);
+    }
+
+    void AimWeapon()
+    {
+        Vector2 aimPivotPosition = rb.position;
+        aimPivotPosition.y += 0.5f;
+        Vector2 aimDirection = mousePosition - aimPivotPosition;
+        float aimAngle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+        hand.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, aimAngle));
+        if (aimAngle < 90f && aimAngle > -90f)
+        {
+            animator.SetBool("looking_left", false);
+            hand.transform.localScale = new Vector3(1f, 1f, 1f);
+        } else if(aimAngle > 90f || aimAngle < -90f)
+        {
+            animator.SetBool("looking_left", true);
+            hand.transform.localScale = new Vector3(1f, -1f, 1f);
+        } 
     }
 
     // Start is called before the first frame update
@@ -42,26 +111,15 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        movementDirection = move.ReadValue<Vector2>();
-
-        // change the animation according to the direction the player is moving
-        animator.SetFloat("Horizontal_movement", movementDirection.x);
-        animator.SetFloat("Vertical_movement", movementDirection.y);
-        animator.SetFloat("Speed", movementDirection.sqrMagnitude);
-        // leave the walking animation looking at the last direction the player moved
-        if(movementDirection.x > 0)
+        movementDirection = playerControls.Player.Move.ReadValue<Vector2>();
+        //mousePosition = camera.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
+        mousePosition = Camera.main.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
+        AnimatePlayer();
+        // Shoot when the player is holding or pressing the attack button
+        if(playerControls.Player.Attack.ReadValue<float>() == 1)
         {
-            animator.SetBool("looking_left", false);
-        } 
-        else if(movementDirection.x == 0 && movementDirection.y != 0)
-        {
-            animator.SetBool("looking_left", false);
+            Shoot();
         }
-        else if(movementDirection.x < 0)
-        {
-            animator.SetBool("looking_left", true);
-        }
-
     }
 
     // FixedUpdate is called at a fixed rate, used for physics
@@ -69,5 +127,7 @@ public class PlayerController : MonoBehaviour
     {
         // rb.MovePosition(rb.position + movementDirection * movementSpeed * Time.fixedDeltaTime);
         rb.velocity = movementDirection * movementSpeed;
+
+        AimWeapon();
     }
 }
