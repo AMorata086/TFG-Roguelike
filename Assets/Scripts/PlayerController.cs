@@ -6,8 +6,11 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    // variables for player movement
+    // Player Stats
     public float movementSpeed = 5f;
+    public float healthPoints = 10;
+
+    // variables for player movement
     private Vector2 movementDirection;
     private Vector2 mousePosition;
 
@@ -19,7 +22,10 @@ public class PlayerController : MonoBehaviour
     public GameObject bulletPrefab;
     public float bulletSpeed;
 
-    //public Camera camera;
+    public Camera playerCamera;
+    // fields for camera movement relative to the player position
+    private Vector3 cameraTargetPosition = new Vector3();
+    public float cameraThreshold;
 
     public Animator animator;
     
@@ -102,6 +108,17 @@ public class PlayerController : MonoBehaviour
         } 
     }
 
+    void DisplaceCamera()
+    {
+        cameraTargetPosition = (rb.position + mousePosition) / 2f;
+
+        cameraTargetPosition.x = Mathf.Clamp(cameraTargetPosition.x, -cameraThreshold + rb.position.x, cameraThreshold + rb.position.x);
+        cameraTargetPosition.y = Mathf.Clamp(cameraTargetPosition.y, -cameraThreshold + rb.position.y, cameraThreshold + rb.position.y);
+        cameraTargetPosition.z = -9f;
+
+        playerCamera.transform.position = cameraTargetPosition;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -112,14 +129,16 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         movementDirection = playerControls.Player.Move.ReadValue<Vector2>();
-        //mousePosition = camera.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
-        mousePosition = Camera.main.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
+        mousePosition = playerCamera.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
+        //mousePosition = Camera.main.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
         AnimatePlayer();
         // Shoot when the player is holding or pressing the attack button
         if(playerControls.Player.Attack.ReadValue<float>() == 1)
         {
             Shoot();
         }
+        DisplaceCamera();
+        AimWeapon();
     }
 
     // FixedUpdate is called at a fixed rate, used for physics
@@ -128,6 +147,7 @@ public class PlayerController : MonoBehaviour
         // rb.MovePosition(rb.position + movementDirection * movementSpeed * Time.fixedDeltaTime);
         rb.velocity = movementDirection * movementSpeed;
 
-        AimWeapon();
+        
+        
     }
 }
