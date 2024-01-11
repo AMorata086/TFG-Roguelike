@@ -7,20 +7,22 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     // Player Stats
-    public float movementSpeed = 5f;
-    public float healthPoints = 10;
+    public float MovementSpeed = 3000f;
+    public float HealthPoints = 10f;
+    public float Damage = 2f;
 
     // variables for player movement
     private Vector2 movementDirection;
     private Vector2 mousePosition;
 
-    public Rigidbody2D rb;
+    public Rigidbody2D Rb;
 
-    public GameObject hand;
+    public GameObject Hand;
 
-    public GameObject shootingPoint;
-    public GameObject bulletPrefab;
-    public float bulletSpeed;
+    public GameObject ShootingPoint;
+    public GameObject BulletPrefab;
+    public float BulletSpeed = 750f;
+    public ParticleSystem MuzzleFlash;
 
     public Camera playerCamera;
     // fields for camera movement relative to the player position
@@ -32,7 +34,7 @@ public class PlayerController : MonoBehaviour
     public InputActions playerControls;
 
     // Cooldown controls
-    public float shootingCooldown = 0.5f;
+    public float ShootingCooldown = 0.5f;
     private float lastShotTime = 0;
 
     private void Awake()
@@ -75,12 +77,14 @@ public class PlayerController : MonoBehaviour
     */
     private void Shoot()
     {
-        if ((Time.time - lastShotTime) < shootingCooldown)
+        if ((Time.time - lastShotTime) < ShootingCooldown)
         {
             return;
         }
-        GameObject bullet = Instantiate(bulletPrefab, shootingPoint.transform.position, shootingPoint.transform.rotation);
-        bullet.GetComponent<Rigidbody2D>().AddForce(shootingPoint.transform.right * bulletSpeed, ForceMode2D.Impulse);
+        ParticleSystem muzzleFlashVFX = ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
+        Destroy(muzzleFlashVFX.gameObject, muzzleFlashVFX.main.duration);
+        GameObject bullet = Instantiate(BulletPrefab, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
+        bullet.GetComponent<Rigidbody2D>().AddForce(ShootingPoint.transform.right * BulletSpeed * Time.deltaTime, ForceMode2D.Impulse);
         lastShotTime = Time.time;
     }
 
@@ -92,28 +96,28 @@ public class PlayerController : MonoBehaviour
 
     void AimWeapon()
     {
-        Vector2 aimPivotPosition = rb.position;
+        Vector2 aimPivotPosition = Rb.position;
         aimPivotPosition.y += 0.5f;
         Vector2 aimDirection = mousePosition - aimPivotPosition;
         float aimAngle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
-        hand.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, aimAngle));
+        Hand.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, aimAngle));
         if (aimAngle < 90f && aimAngle > -90f)
         {
             animator.SetBool("looking_left", false);
-            hand.transform.localScale = new Vector3(1f, 1f, 1f);
+            Hand.transform.localScale = new Vector3(1f, 1f, 1f);
         } else if(aimAngle > 90f || aimAngle < -90f)
         {
             animator.SetBool("looking_left", true);
-            hand.transform.localScale = new Vector3(1f, -1f, 1f);
+            Hand.transform.localScale = new Vector3(1f, -1f, 1f);
         } 
     }
 
     void DisplaceCamera()
     {
-        cameraTargetPosition = (rb.position + mousePosition) / 2f;
+        cameraTargetPosition = (Rb.position + mousePosition) / 2f;
 
-        cameraTargetPosition.x = Mathf.Clamp(cameraTargetPosition.x, -cameraThreshold + rb.position.x, cameraThreshold + rb.position.x);
-        cameraTargetPosition.y = Mathf.Clamp(cameraTargetPosition.y, -cameraThreshold + rb.position.y, cameraThreshold + rb.position.y);
+        cameraTargetPosition.x = Mathf.Clamp(cameraTargetPosition.x, -cameraThreshold + Rb.position.x, cameraThreshold + Rb.position.x);
+        cameraTargetPosition.y = Mathf.Clamp(cameraTargetPosition.y, -cameraThreshold + Rb.position.y, cameraThreshold + Rb.position.y);
         cameraTargetPosition.z = -9f;
 
         playerCamera.transform.position = cameraTargetPosition;
@@ -128,15 +132,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        movementDirection = playerControls.Player.Move.ReadValue<Vector2>();
         mousePosition = playerCamera.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
         //mousePosition = Camera.main.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
         AnimatePlayer();
-        // Shoot when the player is holding or pressing the attack button
-        if(playerControls.Player.Attack.ReadValue<float>() == 1)
-        {
-            Shoot();
-        }
         DisplaceCamera();
         AimWeapon();
     }
@@ -144,10 +142,16 @@ public class PlayerController : MonoBehaviour
     // FixedUpdate is called at a fixed rate, used for physics
     private void FixedUpdate()
     {
-        // rb.MovePosition(rb.position + movementDirection * movementSpeed * Time.fixedDeltaTime);
-        rb.velocity = movementDirection * movementSpeed;
+        movementDirection = playerControls.Player.Move.ReadValue<Vector2>().normalized;
+        // rb.velocity = movementDirection * movementSpeed * Time.deltaTime;
+        Vector2 force = movementDirection * MovementSpeed * Time.deltaTime;
+        Rb.AddForce(force);
+        // Debug.Log(rb.velocity);
 
-        
-        
+        // Shoot when the player is holding or pressing the attack button
+        if(playerControls.Player.Attack.ReadValue<float>() == 1)
+        {
+            Shoot();
+        }
     }
 }

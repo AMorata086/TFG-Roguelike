@@ -6,11 +6,13 @@ TagManager:
   tags:
   - Enemy
   - Environment
+  - Player_Projectile
+  - Enemy_Projectile
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Obstacle
   - Water
   - UI
   - 
