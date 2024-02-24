@@ -1,12 +1,12 @@
 using Pathfinding;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyFlyingController : MonoBehaviour
 {
     /* VARIABLES */
     // Enemy stats
+    [Header("Enemy Stats")]
     public int HealthPoints = 5;
     public int Damage = 1;
     public float MovementSpeed = 3500f;
@@ -21,18 +21,25 @@ public class EnemyFlyingController : MonoBehaviour
     public GameObject AimPoint;
 
     public Animator Animator;
+    [SerializeField] private ParticleSystem deathVFX;
+    [SerializeField] private ParticleSystem explosionVFX;
+    [SerializeField] private SpawnEffect spawnEffect;
+    private DamageEffect damageVFX;
+
+    private GameManager gameManager;
 
     // AI Pathfinding variables
-    Seeker seeker;
-    Transform target;
-    public float NextWaypointDistance = 1f;
-    Path path;
-    int currentWaypoint = 0;
-    bool reachedEndOfPath = false;
+    [Header("AI Pathfinding Variables")]
+    private Seeker seeker;
+    private Transform target;
+    [SerializeField] private float NextWaypointDistance = 1f;
+    private Path path;
+    private int currentWaypoint = 0;
+    private bool reachedEndOfPath = false;
 
-    Vector2 direction;
-    float distanceToTarget;
-    bool isChasingTarget = false;
+    private Vector2 direction;
+    private float distanceToTarget;
+    private bool isChasingTarget = false;
     public float TargetDetectionDistance = 15f;
 
     private void Shoot()
@@ -41,9 +48,37 @@ public class EnemyFlyingController : MonoBehaviour
         {
             return;
         }
-        GameObject bullet = Instantiate(BulletPrefab, AimPoint.transform.position, AimPoint.transform.rotation);
-        bullet.GetComponent<Rigidbody2D>().AddForce(((Vector2)target.position - (Vector2)AimPoint.transform.position).normalized * BulletSpeed * Time.fixedDeltaTime, ForceMode2D.Impulse);
+        Vector2 shootingDirection = ((Vector2)target.position - (Vector2)AimPoint.transform.position).normalized;
+        // Use the Atan2() function in order to get the angle in radians that tan(y/x) forms and convert it to degrees
+        float shootingAngle = Mathf.Atan2(shootingDirection.y, shootingDirection.x) * Mathf.Rad2Deg;
+        GameObject bullet = Instantiate(BulletPrefab, AimPoint.transform.position, Quaternion.Euler(new Vector3(0f, 0f, shootingAngle)));
+        bullet.GetComponent<Rigidbody2D>().AddForce(shootingDirection * BulletSpeed * Time.fixedDeltaTime, ForceMode2D.Impulse);
         lastShotTime = Time.time;
+    }
+
+    public void GetHurt(int damageReceived)
+    {
+        HealthPoints -= damageReceived;
+        damageVFX.CallDamageEffect();
+    }
+
+    private IEnumerator PerformSpawn()
+    {
+        spawnEffect.CallSpawnEffect();
+        yield return new WaitForSeconds(spawnEffect.GetSpawnEffectDuration());
+        InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+        yield return null;
+    }
+
+    private void PerformDeath()
+    {
+        if (HealthPoints <= 0)
+        {
+            gameManager.DecrementCurrentEnemies();
+            ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
+            ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+            Destroy(gameObject);
+        }
     }
 
     private GameObject FindTarget()
@@ -59,7 +94,9 @@ public class EnemyFlyingController : MonoBehaviour
 
     private void AnimateEnemy()
     {
-        // TODO
+        Vector2 lookingDirection = (Vector2)target.position - (Vector2)Rb.position;
+        Animator.SetBool("Moving", isChasingTarget);
+        Animator.SetFloat("Direction", lookingDirection.x);
     }
 
     void OnPathComplete(Path p)
@@ -79,11 +116,25 @@ public class EnemyFlyingController : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        GameObject parentObject = GameObject.Find("Game Manager");
+        if (parentObject == null)
+        {
+            Debug.Log("CRITIAL ERROR: Game Manager object not found");
+            return;
+        }
+        gameManager = parentObject.GetComponent<GameManager>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        Coroutine spawnCoroutine = StartCoroutine(PerformSpawn());
+
         target = FindTarget().transform;
         seeker = GetComponent<Seeker>();
+        damageVFX = GetComponent<DamageEffect>();
         InvokeRepeating("UpdatePath", 0f, 0.1f);
     }
 
@@ -103,6 +154,7 @@ public class EnemyFlyingController : MonoBehaviour
             isShooting = true;
         }
 
+        PerformDeath();
         AnimateEnemy();
     }
 

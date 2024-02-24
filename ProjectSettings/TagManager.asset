@@ -8,6 +8,9 @@ TagManager:
   - Environment
   - Player_Projectile
   - Enemy_Projectile
+  - Enemy_Flying
+  - Enemy_Melee
+  - Enemy_Ranged
   layers:
   - Default
   - TransparentFX

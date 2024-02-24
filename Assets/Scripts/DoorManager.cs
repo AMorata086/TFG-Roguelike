@@ -9,7 +9,7 @@ public class DoorManager : MonoBehaviour
     public Tilemap doorsClosed;
     public Tilemap doorsOpen;
 
-    void SwitchDoorState ()
+    public void SwitchDoorState ()
     {
         if (!doorsOpen.gameObject.activeSelf)
         {

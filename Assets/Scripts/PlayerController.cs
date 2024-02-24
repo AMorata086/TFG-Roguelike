@@ -1,15 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     // Player Stats
+    [Header("Player Stats")]
     public float MovementSpeed = 3000f;
-    public float HealthPoints = 10f;
-    public float Damage = 2f;
+    public int HealthPoints = 10;
+    public int Damage = 2;
 
     // variables for player movement
     private Vector2 movementDirection;
@@ -24,13 +22,16 @@ public class PlayerController : MonoBehaviour
     public float BulletSpeed = 750f;
     public ParticleSystem MuzzleFlash;
 
+    [SerializeField] private ParticleSystem deathVFX;
+    private DamageEffect damageVFX;
+
     public Camera playerCamera;
     // fields for camera movement relative to the player position
     private Vector3 cameraTargetPosition = new Vector3();
     public float cameraThreshold;
 
     public Animator animator;
-    
+
     public InputActions playerControls;
 
     // Cooldown controls
@@ -81,11 +82,26 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-        ParticleSystem muzzleFlashVFX = ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
-        Destroy(muzzleFlashVFX.gameObject, muzzleFlashVFX.main.duration);
+        ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
         GameObject bullet = Instantiate(BulletPrefab, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
+        bullet.GetComponent<PlayerBulletScript>().Damage = Damage;
         bullet.GetComponent<Rigidbody2D>().AddForce(ShootingPoint.transform.right * BulletSpeed * Time.deltaTime, ForceMode2D.Impulse);
         lastShotTime = Time.time;
+    }
+
+    public void GetHurt(int damage)
+    {
+        HealthPoints -= damage;
+        damageVFX.CallDamageEffect();
+    }
+
+    private void PerformDeath()
+    {
+        if (HealthPoints <= 0)
+        {
+            ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
+            Destroy(gameObject);
+        }
     }
 
     void AnimatePlayer()
@@ -105,11 +121,12 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetBool("looking_left", false);
             Hand.transform.localScale = new Vector3(1f, 1f, 1f);
-        } else if(aimAngle > 90f || aimAngle < -90f)
+        }
+        else if (aimAngle > 90f || aimAngle < -90f)
         {
             animator.SetBool("looking_left", true);
             Hand.transform.localScale = new Vector3(1f, -1f, 1f);
-        } 
+        }
     }
 
     void DisplaceCamera()
@@ -126,7 +143,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        damageVFX = GetComponent<DamageEffect>();
     }
 
     // Update is called once per frame
@@ -137,6 +154,7 @@ public class PlayerController : MonoBehaviour
         AnimatePlayer();
         DisplaceCamera();
         AimWeapon();
+        //PerformDeath();
     }
 
     // FixedUpdate is called at a fixed rate, used for physics
@@ -149,7 +167,7 @@ public class PlayerController : MonoBehaviour
         // Debug.Log(rb.velocity);
 
         // Shoot when the player is holding or pressing the attack button
-        if(playerControls.Player.Attack.ReadValue<float>() == 1)
+        if (playerControls.Player.Attack.ReadValue<float>() == 1)
         {
             Shoot();
         }

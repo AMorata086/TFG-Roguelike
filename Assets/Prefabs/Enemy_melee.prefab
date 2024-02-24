@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6101160501256134453}
   m_Layer: 0
   m_Name: Hitbox
-  m_TagString: Enemy
+  m_TagString: Enemy_Melee
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -174,7 +174,9 @@ GameObject:
   - component: {fileID: 8519871073452827978}
   - component: {fileID: 8208340507880783709}
   - component: {fileID: 6074782299953556454}
+  - component: {fileID: 5379955965228014434}
   - component: {fileID: 5388969541494455597}
+  - component: {fileID: 8948650052214506691}
   m_Layer: 0
   m_Name: Enemy_melee
   m_TagString: Untagged
@@ -191,7 +193,7 @@ Transform:
   m_GameObject: {fileID: 9198145753397688233}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.8, y: -2.44, z: 0}
+  m_LocalPosition: {x: 2.3492436, y: 1.0694408, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -384,14 +386,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26febf0c3ae8ae84a818e3d888cc3906, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HealthPoints: 15
-  MeleeDamage: 1
+  HealthPoints: 20
+  damage: 5
+  knockbackForce: 500
   MovementSpeed: 2000
   Rb: {fileID: 4183626379812194677}
   Animator: {fileID: 8519871073452827978}
-  target: {fileID: 0}
+  deathVFX: {fileID: 8320190755773182064, guid: 7d398133259edd24db97d8376ebe36db, type: 3}
+  explosionVFX: {fileID: 803975109124953716, guid: f31401f9e3cdee145be97946d18630be, type: 3}
+  spawnEffect: {fileID: 8948650052214506691}
+  gameManager: {fileID: 0}
   NextWaypointDistance: 1
   TargetDetectionDistance: 10
+--- !u!114 &5379955965228014434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9198145753397688233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb00298edba39064690cbd53fd7f3ccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteLitMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  damageEffectMaterial: {fileID: 2100000, guid: dca04c481a925224fa1aa40121c1a1e3, type: 2}
+  effectTime: 0.1
 --- !u!114 &5388969541494455597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,3 +428,18 @@ MonoBehaviour:
   version: 1
   unwrap: 1
   splitAtEveryPortal: 0
+--- !u!114 &8948650052214506691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9198145753397688233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b58aad648e58ba04bba2ff695fe16ebb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalSpriteMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  spawnEffectMaterial: {fileID: 2100000, guid: 205c98a5d66959d4890b32e4e7ed228c, type: 2}
+  incrementQuantity: 0.01

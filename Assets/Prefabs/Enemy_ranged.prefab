@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 4156606017505176062}
   m_Layer: 0
   m_Name: Hitbox
-  m_TagString: Enemy
+  m_TagString: Enemy_Ranged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -205,7 +205,9 @@ GameObject:
   - component: {fileID: 5069365151793667908}
   - component: {fileID: 2207858069952717845}
   - component: {fileID: 1210152811868533552}
+  - component: {fileID: 4108493554083817539}
   - component: {fileID: 1938466726120635442}
+  - component: {fileID: 2096467616534509406}
   m_Layer: 0
   m_Name: Enemy_ranged
   m_TagString: Untagged
@@ -222,7 +224,7 @@ Transform:
   m_GameObject: {fileID: 5425109143393141815}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 51.09, y: 40.34, z: -0.2085227}
+  m_LocalPosition: {x: 4.7735415, y: 0.16239072, z: -0.2085227}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -426,8 +428,27 @@ MonoBehaviour:
   Rb: {fileID: 8116244501896614313}
   AimPoint: {fileID: 7954267310352488725}
   Animator: {fileID: 5069365151793667908}
+  deathVFX: {fileID: 8320190755773182064, guid: 7d398133259edd24db97d8376ebe36db, type: 3}
+  explosionVFX: {fileID: 803975109124953716, guid: f31401f9e3cdee145be97946d18630be, type: 3}
+  spawnEffect: {fileID: 2096467616534509406}
+  gameManager: {fileID: 0}
   NextWaypointDistance: 1
   TargetDetectionDistance: 15
+--- !u!114 &4108493554083817539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5425109143393141815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb00298edba39064690cbd53fd7f3ccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteLitMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  damageEffectMaterial: {fileID: 2100000, guid: dca04c481a925224fa1aa40121c1a1e3, type: 2}
+  effectTime: 0.1
 --- !u!114 &1938466726120635442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -443,6 +464,21 @@ MonoBehaviour:
   version: 1
   unwrap: 1
   splitAtEveryPortal: 0
+--- !u!114 &2096467616534509406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5425109143393141815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b58aad648e58ba04bba2ff695fe16ebb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalSpriteMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  spawnEffectMaterial: {fileID: 2100000, guid: 205c98a5d66959d4890b32e4e7ed228c, type: 2}
+  incrementQuantity: 0.01
 --- !u!1 &7954267310352488725
 GameObject:
   m_ObjectHideFlags: 0

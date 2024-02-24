@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1435407341011514727}
   m_Layer: 0
   m_Name: Hitbox
-  m_TagString: Enemy
+  m_TagString: Enemy_Flying
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -174,7 +174,9 @@ GameObject:
   - component: {fileID: 8975761138816076492}
   - component: {fileID: 5824634339828697130}
   - component: {fileID: 1882287283387479786}
+  - component: {fileID: 4317618801223915213}
   - component: {fileID: 4698580817060413199}
+  - component: {fileID: 3989087684954840069}
   m_Layer: 0
   m_Name: Enemy_flying
   m_TagString: Untagged
@@ -191,7 +193,7 @@ Transform:
   m_GameObject: {fileID: 6970763896357816480}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.18, y: 0.02, z: 0}
+  m_LocalPosition: {x: 2.695572, y: -1.2064304, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -395,8 +397,27 @@ MonoBehaviour:
   Rb: {fileID: 110575459661948499}
   AimPoint: {fileID: 9144482705293545111}
   Animator: {fileID: 8975761138816076492}
+  deathVFX: {fileID: 8320190755773182064, guid: 7d398133259edd24db97d8376ebe36db, type: 3}
+  explosionVFX: {fileID: 803975109124953716, guid: f31401f9e3cdee145be97946d18630be, type: 3}
+  spawnEffect: {fileID: 3989087684954840069}
+  gameManager: {fileID: 0}
   NextWaypointDistance: 1
   TargetDetectionDistance: 15
+--- !u!114 &4317618801223915213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6970763896357816480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb00298edba39064690cbd53fd7f3ccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteLitMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  damageEffectMaterial: {fileID: 2100000, guid: dca04c481a925224fa1aa40121c1a1e3, type: 2}
+  effectTime: 0.1
 --- !u!114 &4698580817060413199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,6 +433,21 @@ MonoBehaviour:
   version: 1
   unwrap: 1
   splitAtEveryPortal: 0
+--- !u!114 &3989087684954840069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6970763896357816480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b58aad648e58ba04bba2ff695fe16ebb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalSpriteMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  spawnEffectMaterial: {fileID: 2100000, guid: 205c98a5d66959d4890b32e4e7ed228c, type: 2}
+  incrementQuantity: 0.01
 --- !u!1 &9144482705293545111
 GameObject:
   m_ObjectHideFlags: 0

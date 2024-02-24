@@ -1,12 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Pathfinding;
+using System.Collections;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 public class EnemyRangeController : MonoBehaviour
 {
     /* VARIABLES */
     // Enemy stats
+    [Header("Enemy Stats")]
     public int HealthPoints = 15;
     public int Damage = 1;
     public float MovementSpeed = 2000f;
@@ -22,11 +24,18 @@ public class EnemyRangeController : MonoBehaviour
     Transform shootingPoint;
 
     public Animator Animator;
+    [SerializeField] private ParticleSystem deathVFX;
+    [SerializeField] private ParticleSystem explosionVFX;
+    [SerializeField] private SpawnEffect spawnEffect;
+    private DamageEffect damageVFX;
+
+    private GameManager gameManager;
 
     // AI Pathfinding variables
+    [Header("AI Pathfinding Variables")]
     Seeker seeker;
     Transform target;
-    public float NextWaypointDistance = 1f;
+    [SerializeField] private float NextWaypointDistance = 1f;
     Path path;
     int currentWaypoint = 0;
     bool reachedEndOfPath = false;
@@ -42,9 +51,37 @@ public class EnemyRangeController : MonoBehaviour
         {
             return;
         }
-        GameObject bullet = Instantiate(BulletPrefab, shootingPoint.position, shootingPoint.rotation);
-        bullet.GetComponent<Rigidbody2D>().AddForce(((Vector2)target.position - (Vector2)shootingPoint.position).normalized * BulletSpeed * Time.fixedDeltaTime, ForceMode2D.Impulse);
+        Vector2 shootingDirection = ((Vector2)target.position - (Vector2)shootingPoint.position).normalized;
+        // Use the Atan2() function in order to get the angle in radians that tan(y/x) forms and convert it to degrees
+        float shootingAngle = Mathf.Atan2(shootingDirection.y, shootingDirection.x) * Mathf.Rad2Deg;
+        GameObject bullet = Instantiate(BulletPrefab, shootingPoint.position, Quaternion.Euler(new Vector3 (0f, 0f, shootingAngle)));
+        bullet.GetComponent<Rigidbody2D>().AddForce(shootingDirection * BulletSpeed * Time.fixedDeltaTime, ForceMode2D.Impulse);
         lastShotTime = Time.time;
+    }
+
+    public void GetHurt(int damageReceived)
+    {
+        HealthPoints -= damageReceived;
+        damageVFX.CallDamageEffect();
+    }
+
+    private IEnumerator PerformSpawn()
+    {
+        spawnEffect.CallSpawnEffect();
+        yield return new WaitForSeconds(spawnEffect.GetSpawnEffectDuration());
+        InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+        yield return null;
+    }
+
+    private void PerformDeath()
+    {
+        if (HealthPoints <= 0)
+        {
+            gameManager.DecrementCurrentEnemies();
+            ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
+            ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+            Destroy(gameObject);
+        }
     }
 
     private GameObject FindTarget()
@@ -66,7 +103,8 @@ public class EnemyRangeController : MonoBehaviour
         if (lookingDirection.x < 0)
         {
             AimPoint.transform.localScale = new Vector3(-1, 1, 1);
-        } else
+        }
+        else
         {
             AimPoint.transform.localScale = new Vector3(1, 1, 1);
         }
@@ -89,12 +127,26 @@ public class EnemyRangeController : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        GameObject parentObject = GameObject.Find("Game Manager");
+        if (parentObject == null)
+        {
+            Debug.Log("CRITIAL ERROR: Game Manager object not found");
+            return;
+        }
+        gameManager = parentObject.GetComponent<GameManager>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        Coroutine spawnCoroutine = StartCoroutine(PerformSpawn());
+
         target = FindTarget().transform;
         seeker = GetComponent<Seeker>();
         shootingPoint = AimPoint.transform.GetChild(0);
+        damageVFX = GetComponent<DamageEffect>();
         InvokeRepeating("UpdatePath", 0f, 0.1f);
 
     }
@@ -112,12 +164,15 @@ public class EnemyRangeController : MonoBehaviour
         {
             isChasingTarget = true;
             isShooting = false;
-        } else if (distanceToTarget <= MaxShootingDistance)
+        }
+        else if (distanceToTarget <= MaxShootingDistance)
         {
             isChasingTarget = false;
             isShooting = true;
-            
+
         }
+
+        PerformDeath();
         AnimateEnemy();
     }
 
@@ -138,16 +193,16 @@ public class EnemyRangeController : MonoBehaviour
             reachedEndOfPath = false;
         }
 
-        
+
         if (isChasingTarget)
         {
             direction = ((Vector2)path.vectorPath[currentWaypoint] - Rb.position).normalized;
             Vector2 force = MovementSpeed * Time.deltaTime * direction;
             Rb.AddForce(force);
         }
-        
 
-        if(isShooting)
+
+        if (isShooting)
         {
             Shoot();
         }

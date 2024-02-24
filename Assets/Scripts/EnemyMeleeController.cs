@@ -1,23 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Pathfinding;
-using UnityEditor;
+using System.Collections;
+using UnityEngine;
 
 public class EnemyMeleeController : MonoBehaviour
 {
     /* VARIABLES */
     // Enemy Stats
-    public int HealthPoints = 15;
-    public int Damage = 5;
+    [Header("Enemy Stats")]
+    public int HealthPoints = 10;
+    [SerializeField] private int damage = 5;
+    [SerializeField] private float knockbackForce = 1000f;
     public float MovementSpeed = 2500f;
     public Rigidbody2D Rb;
 
     public Animator Animator;
+    [SerializeField] private ParticleSystem deathVFX;
+    [SerializeField] private ParticleSystem explosionVFX;
+    [SerializeField] private SpawnEffect spawnEffect;
+    private DamageEffect damageVFX;
+
+    private GameManager gameManager;
 
     // AI Pathfinding variables
+    [Header("AI Pathfinding Variables")]
     Transform target;
-    public float NextWaypointDistance = 1f;
+    [SerializeField] private float NextWaypointDistance = 1f;
     Path path;
     int currentWaypoint = 0;
     bool reachedEndOfPath = false;
@@ -27,6 +34,48 @@ public class EnemyMeleeController : MonoBehaviour
     float distanceToTarget;
     bool isChasingTarget = false;
     public float TargetDetectionDistance = 10f;
+
+    public void GetHurt(int damageReceived)
+    {
+        HealthPoints -= damageReceived;
+        damageVFX.CallDamageEffect();
+    }
+
+    private IEnumerator PerformSpawn()
+    {
+        spawnEffect.CallSpawnEffect();
+        yield return new WaitForSeconds(spawnEffect.GetSpawnEffectDuration());
+        InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+        yield return null;
+    }
+
+    private void PerformDeath()
+    {
+        if (HealthPoints <= 0)
+        {
+            gameManager.DecrementCurrentEnemies();
+            ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
+            ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+            Destroy(gameObject);
+        }
+    }
+
+    private void AttackTarget(Collider2D collision)
+    {
+        // invoke the GetHurt method from the player's controller
+        collision.gameObject.GetComponentInParent<PlayerController>().GetHurt(damage);
+        // Apply a knockback to the player when in contact with the enemy
+        collision.gameObject.GetComponentInParent<Rigidbody2D>().AddForce(gameObject.GetComponent<Rigidbody2D>().velocity.normalized * knockbackForce * Time.fixedDeltaTime, ForceMode2D.Impulse);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            // Attack the player
+            AttackTarget(collision);
+        }
+    }
 
     private GameObject FindTarget()
     {
@@ -39,7 +88,7 @@ public class EnemyMeleeController : MonoBehaviour
         return targets[Random.Range(0, targets.Length)];
     }
 
-    void OnPathComplete(Path p)
+    private void OnPathComplete(Path p)
     {
         if (!p.error)
         {
@@ -48,7 +97,7 @@ public class EnemyMeleeController : MonoBehaviour
         }
     }
 
-    void AnimateEnemy()
+    private void AnimateEnemy()
     {
         if (direction.sqrMagnitude == 0)
         {
@@ -60,8 +109,8 @@ public class EnemyMeleeController : MonoBehaviour
             Animator.SetFloat("Moving_direction", direction.normalized.x);
         }
     }
-    
-    void UpdatePath()
+
+    private void UpdatePath()
     {
         if (seeker.IsDone() && isChasingTarget)
         {
@@ -69,27 +118,42 @@ public class EnemyMeleeController : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        target = FindTarget().transform;
-        seeker = GetComponent<Seeker>();
-        InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+        GameObject parentObject = GameObject.Find("Game Manager");  
+        if(parentObject == null)
+        {
+            Debug.Log("CRITIAL ERROR: Game Manager object not found");
+            return;
+        }
+        gameManager = parentObject.GetComponent<GameManager>();
     }
 
-    void Update()
+    // Start is called before the first frame update
+    private void Start()
+    {
+        Coroutine spawnCoroutine = StartCoroutine(PerformSpawn());
+        
+        target = FindTarget().transform;
+        seeker = GetComponent<Seeker>();
+        damageVFX = GetComponent<DamageEffect>();
+    }
+
+    private void Update()
     {
         distanceToTarget = Vector2.Distance(Rb.position, target.position);
         if (distanceToTarget <= TargetDetectionDistance)
         {
             isChasingTarget = true;
         }
-        AnimateEnemy();    
+
+        PerformDeath();
+        AnimateEnemy();
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        if(path == null)
+        if (path == null)
         {
             return;
         }
