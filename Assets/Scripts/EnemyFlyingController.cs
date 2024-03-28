@@ -53,6 +53,7 @@ public class EnemyFlyingController : MonoBehaviour
         float shootingAngle = Mathf.Atan2(shootingDirection.y, shootingDirection.x) * Mathf.Rad2Deg;
         GameObject bullet = Instantiate(BulletPrefab, AimPoint.transform.position, Quaternion.Euler(new Vector3(0f, 0f, shootingAngle)));
         bullet.GetComponent<Rigidbody2D>().AddForce(shootingDirection * BulletSpeed * Time.fixedDeltaTime, ForceMode2D.Impulse);
+        bullet.GetComponent<EnemyBulletScript>().Damage = Damage;
         lastShotTime = Time.time;
     }
 
@@ -65,7 +66,7 @@ public class EnemyFlyingController : MonoBehaviour
     private IEnumerator PerformSpawn()
     {
         spawnEffect.CallSpawnEffect();
-        yield return new WaitForSeconds(spawnEffect.GetSpawnEffectDuration());
+        yield return new WaitForSeconds(1);
         InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
         yield return null;
     }
@@ -108,7 +109,7 @@ public class EnemyFlyingController : MonoBehaviour
         }
     }
 
-    void UpdatePath()
+    private void UpdatePath()
     {
         if (seeker.IsDone() && isChasingTarget)
         {
@@ -135,7 +136,6 @@ public class EnemyFlyingController : MonoBehaviour
         target = FindTarget().transform;
         seeker = GetComponent<Seeker>();
         damageVFX = GetComponent<DamageEffect>();
-        InvokeRepeating("UpdatePath", 0f, 0.1f);
     }
 
     // Update is called once per frame

@@ -5,6 +5,7 @@ public class PlayerBulletScript : MonoBehaviour
     public float forceOfImpact = 500f;
     public int Damage = 0;
     public ParticleSystem ImpactParticlesPrefab;
+    public PlayerController Player;
 
     void TriggerParticleEffects()
     {
@@ -46,6 +47,11 @@ public class PlayerBulletScript : MonoBehaviour
                 break;
             case "Enemy_Projectile":
                 TriggerParticleEffects();
+                Destroy(gameObject);
+                break;
+            case "Health_Pack":
+                TriggerParticleEffects();
+                Player.Heal(collision.gameObject.GetComponent<HealthPackScript>().GetHealth());
                 Destroy(gameObject);
                 break;
             default:

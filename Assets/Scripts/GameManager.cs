@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
         // public int numberOfWaves;
         public int[] enemiesInWave;
 
-        public Wave(int numberOfWaves, int[] enemiesInWave)
+        public Wave(int[] enemiesInWave)
         {
             // this.numberOfWaves = numberOfWaves;
             this.enemiesInWave = enemiesInWave;
@@ -53,16 +53,16 @@ public class GameManager : MonoBehaviour
             // retrieve the max number of enemies per room
             int maxNumberOfEnemies = rooms[i].spawnPoints.Length;
             // fill in the wave with enemies
-            int[] enemiesInWave = new int[maxNumberOfEnemies];
-            for (int k = 0; k < enemiesInWave.Length; k++)
-            {
-                enemiesInWave[k] = Random.Range(1, rooms[i].enemiesAllowed + 1);
-            }
-            wavesInRoom[i] = new Wave[enemiesInWave.Length];
+            wavesInRoom[i] = new Wave[rooms[i].numberOfWaves/*enemiesInWave.Length*/];
             // iterate each wave in that specific room
             for (int j = 0; j < rooms[i].numberOfWaves; j++)
             {
-                wavesInRoom[i][j] = new Wave(rooms[i].numberOfWaves, enemiesInWave);
+                int[] enemiesInWave = new int[maxNumberOfEnemies];
+                for (int k = 0; k < enemiesInWave.Length; k++)
+                {
+                    enemiesInWave[k] = Random.Range(1, rooms[i].enemiesAllowed + 1);
+                }
+                wavesInRoom[i][j] = new Wave(enemiesInWave);
             }
         }
     }
@@ -70,7 +70,6 @@ public class GameManager : MonoBehaviour
     public void DecrementCurrentEnemies()
     {
         currentEnemies--;
-        Debug.Log("Enemies decreased; current enemies = " + currentEnemies);
     }
 
     // when called spawn the waves of enemies of that room in an order

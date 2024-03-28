@@ -11,6 +11,7 @@ TagManager:
   - Enemy_Flying
   - Enemy_Melee
   - Enemy_Ranged
+  - Health_Pack
   layers:
   - Default
   - TransparentFX

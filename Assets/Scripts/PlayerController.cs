@@ -6,7 +6,8 @@ public class PlayerController : MonoBehaviour
     // Player Stats
     [Header("Player Stats")]
     public float MovementSpeed = 3000f;
-    public int HealthPoints = 10;
+    public int MaxHealthPoints = 10;
+    private int CurrentHealthPoints = 10;
     public int Damage = 2;
 
     // variables for player movement
@@ -37,6 +38,8 @@ public class PlayerController : MonoBehaviour
     // Cooldown controls
     public float ShootingCooldown = 0.5f;
     private float lastShotTime = 0;
+
+    [SerializeField] private InGameUIScript interfaceScript; 
 
     private void Awake()
     {
@@ -85,19 +88,38 @@ public class PlayerController : MonoBehaviour
         ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
         GameObject bullet = Instantiate(BulletPrefab, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
         bullet.GetComponent<PlayerBulletScript>().Damage = Damage;
+        bullet.GetComponent<PlayerBulletScript>().Player = gameObject.GetComponent<PlayerController>(); // test this
         bullet.GetComponent<Rigidbody2D>().AddForce(ShootingPoint.transform.right * BulletSpeed * Time.deltaTime, ForceMode2D.Impulse);
         lastShotTime = Time.time;
     }
 
     public void GetHurt(int damage)
     {
-        HealthPoints -= damage;
+        CurrentHealthPoints -= damage;
+        interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+        Debug.Log("Ouch! Current HP: " + CurrentHealthPoints);
         damageVFX.CallDamageEffect();
+    }
+
+    public void Heal(int healthRestored)
+    {
+        // Control the health points not overflowing the Max Health value
+        if ((((CurrentHealthPoints + healthRestored) % MaxHealthPoints) == (CurrentHealthPoints + healthRestored)) ||
+            (((CurrentHealthPoints + healthRestored) % MaxHealthPoints) == 0))
+        {
+            CurrentHealthPoints += healthRestored;
+        } 
+        else
+        {
+            int mod = (CurrentHealthPoints + healthRestored) % MaxHealthPoints;
+            CurrentHealthPoints += healthRestored - mod;
+        }
+        interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
     }
 
     private void PerformDeath()
     {
-        if (HealthPoints <= 0)
+        if (CurrentHealthPoints <= 0)
         {
             ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
             Destroy(gameObject);
@@ -144,6 +166,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         damageVFX = GetComponent<DamageEffect>();
+        CurrentHealthPoints = MaxHealthPoints;
+        interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
     }
 
     // Update is called once per frame

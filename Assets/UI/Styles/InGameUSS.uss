@@ -1,0 +1,195 @@
+* {
+    cursor: url('project://database/Assets/Sprites/crosshair.png?fileID=2800000&guid=124b63369f293aa47a5cac25f62179cf&type=3#crosshair');
+}
+
+.MainContainer {
+    width: 100%;
+    height: 100%;
+    -unity-font: url('project://database/Assets/Fonts/PixeloidMono.ttf?fileID=12800000&guid=6ebbc729a046ced408c7757ec16f64b9&type=3#PixeloidMono');
+    -unity-font-definition: initial;
+    font-size: 14px;
+    -unity-font-style: normal;
+    cursor: url('project://database/Assets/Sprites/crosshair.png?fileID=2800000&guid=124b63369f293aa47a5cac25f62179cf&type=3#crosshair');
+}
+
+.PlayerInfo {
+    width: 20%;
+    height: 12.5%;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.PortraitContainer {
+    width: 25%;
+    background-color: rgba(28, 204, 34, 0);
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.PlayerPortrait {
+    background-image: url('project://database/Assets/Sprites/player_1-Sheet.png?fileID=1356591213&guid=4dfec6c66f6724b4aa322e323a241e85&type=3#player_1-right_idle0');
+    width: 80%;
+    height: 60%;
+    -unity-background-scale-mode: scale-to-fit;
+    background-color: rgb(51, 57, 65);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
+    border-bottom-left-radius: 1px;
+}
+
+.HealthInfo {
+    width: 75%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    height: 100%;
+    align-self: auto;
+}
+
+.NameContainer {
+    width: 100%;
+    height: auto;
+}
+
+.NameContainer Label {
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
+    margin-right: 0;
+    margin-left: 0;
+    -unity-font: url('project://database/Assets/Fonts/PixeloidMono.ttf?fileID=12800000&guid=6ebbc729a046ced408c7757ec16f64b9&type=3#PixeloidMono');
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 0;
+    -unity-text-outline-color: rgba(255, 255, 255, 0);
+    letter-spacing: 0;
+    font-size: 14px;
+    -unity-font-style: normal;
+    -unity-font-definition: initial;
+    text-overflow: clip;
+}
+
+.HealthBarContainer {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+}
+
+.LabelHealth {
+    background-color: rgba(0, 0, 0, 0);
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    min-width: auto;
+    min-height: auto;
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    background-image: url('project://database/Assets/Sprites/heart.png?fileID=21300000&guid=d97189ff2ec983744960058a4717c951&type=3#heart');
+    width: 15%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.HPBar {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+    width: 85%;
+    height: 100%;
+    -unity-font: url('project://database/Assets/Fonts/PixeloidMono.ttf?fileID=12800000&guid=6ebbc729a046ced408c7757ec16f64b9&type=3#PixeloidMono');
+    -unity-font-definition: initial;
+    -unity-font-style: normal;
+    -unity-text-align: middle-center;
+    font-size: 12px;
+    -unity-text-outline-width: 0;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+    max-height: none;
+    min-height: auto;
+    min-width: auto;
+    max-width: none;
+    flex-wrap: wrap;
+}
+
+.HPBar .unity-progress-bar__container {
+    min-width: auto;
+    min-height: auto;
+    max-height: none;
+    max-width: none;
+    height: 100%;
+}
+
+.HPBar .unity-progress-bar__background {
+    background-color: rgb(33, 33, 33);
+    border-left-color: rgb(180, 32, 42);
+    border-right-color: rgb(180, 32, 42);
+    border-top-color: rgb(180, 32, 42);
+    border-bottom-color: rgb(180, 32, 42);
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
+    border-bottom-left-radius: 1px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    height: auto;
+}
+
+.HPBar .unity-progress-bar__progress {
+    background-color: rgb(180, 32, 42);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    height: auto;
+}
+
+.HPBar .unity-progress-bar__title {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    -unity-font: url('project://database/Assets/Fonts/PixeloidMono.ttf?fileID=12800000&guid=6ebbc729a046ced408c7757ec16f64b9&type=3#PixeloidMono');
+    -unity-font-definition: initial;
+    -unity-font-style: normal;
+}

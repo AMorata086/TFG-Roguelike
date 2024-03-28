@@ -44,7 +44,7 @@ public class EnemyMeleeController : MonoBehaviour
     private IEnumerator PerformSpawn()
     {
         spawnEffect.CallSpawnEffect();
-        yield return new WaitForSeconds(spawnEffect.GetSpawnEffectDuration());
+        yield return new WaitForSeconds(1);
         InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
         yield return null;
     }
@@ -121,7 +121,7 @@ public class EnemyMeleeController : MonoBehaviour
     private void Awake()
     {
         GameObject parentObject = GameObject.Find("Game Manager");  
-        if(parentObject == null)
+        if (parentObject == null)
         {
             Debug.Log("CRITIAL ERROR: Game Manager object not found");
             return;
