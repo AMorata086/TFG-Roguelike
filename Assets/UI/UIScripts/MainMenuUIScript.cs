@@ -18,22 +18,22 @@ public class MainMenuUIScript : MonoBehaviour
         multiplayerButton = root.Q<Button>("MultiplayerButton");
         exitButton = root.Q<Button>("QuitButton");
 
-        singlePlayerButton.RegisterCallback<ClickEvent>(playOffline);
-        multiplayerButton.RegisterCallback<ClickEvent>(playOnline);
-        exitButton.RegisterCallback<ClickEvent>(quitGame);
+        singlePlayerButton.RegisterCallback<ClickEvent>(PlayOffline);
+        multiplayerButton.RegisterCallback<ClickEvent>(PlayOnline);
+        exitButton.RegisterCallback<ClickEvent>(QuitGame);
     }
 
-    private void playOffline(ClickEvent clickEvent)
+    private void PlayOffline(ClickEvent clickEvent)
     {
         Loader.LoadScene(Loader.Scene.OfflineLevel1);
     }
 
-    private void playOnline(ClickEvent clickEvent)
+    private void PlayOnline(ClickEvent clickEvent)
     {
 
     }
 
-    private void quitGame(ClickEvent clickEvent)
+    private void QuitGame(ClickEvent clickEvent)
     {
         Application.Quit();
     }

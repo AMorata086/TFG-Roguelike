@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class EnemyBulletScript : MonoBehaviour
+public class EnemyBulletScript : NetworkBehaviour
 {
     public float forceOfImpact = 500f;
     public int Damage = 0;

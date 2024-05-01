@@ -1,7 +1,8 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     // Player Stats
     [Header("Player Stats")]
@@ -9,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public int MaxHealthPoints = 10;
     private int CurrentHealthPoints = 10;
     public int Damage = 2;
+    private bool canMove = false;
 
     // variables for player movement
     private Vector2 movementDirection;
@@ -20,13 +22,14 @@ public class PlayerController : MonoBehaviour
 
     public GameObject ShootingPoint;
     public GameObject BulletPrefab;
+    private string bulletTag = "";
     public float BulletSpeed = 750f;
     public ParticleSystem MuzzleFlash;
 
     [SerializeField] private ParticleSystem deathVFX;
     private DamageEffect damageVFX;
 
-    public Camera playerCamera;
+    public Camera PlayerCamera;
     // fields for camera movement relative to the player position
     private Vector3 cameraTargetPosition = new Vector3();
     public float cameraThreshold;
@@ -36,68 +39,63 @@ public class PlayerController : MonoBehaviour
     public InputActions playerControls;
 
     // Cooldown controls
-    public float ShootingCooldown = 0.5f;
-    private float lastShotTime = 0;
+    [SerializeField] private float dodgeCooldown = 2f;
+    private float lastDodgeTime = 0f;
+    [SerializeField] private float shootingCooldown = 0.5f;
+    private float lastShotTime = 0f;
 
-    [SerializeField] private InGameUIScript interfaceScript; 
+    [SerializeField] private InGameUIScript interfaceScript;
+    [SerializeField] private SoundEffectManager soundEffectManager;
 
-    private void Awake()
-    {
-        playerControls = new InputActions();
-        // Subscribe to the actions that are button type
-        // playerControls.Player.Attack.performed += Shoot;
-        playerControls.Player.Dodge.performed += Dodge;
-    }
-
-    private void OnEnable()
-    {
-        playerControls.Player.Enable();
-    }
-
-    private void OnDisable()
-    {
-        playerControls.Player.Disable();
-    }
+    [SerializeField] private PlayerSpritesReferences playerSpritesReferences;
 
     private void Dodge(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
-    }
-
-    /*
-    private void Shoot(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            if (Time.time - lastShotTime < shootingCooldown) 
-            {
-                return;
-            }
-            GameObject bullet = Instantiate(bulletPrefab, shootingPoint.transform.position, shootingPoint.transform.rotation);
-            bullet.GetComponent<Rigidbody2D>().AddForce(shootingPoint.transform.right * bulletSpeed, ForceMode2D.Impulse);
-            lastShotTime = Time.time;
-        }
-    }
-    */
-    private void Shoot()
-    {
-        if ((Time.time - lastShotTime) < ShootingCooldown)
+        if ((Time.time - lastDodgeTime) < dodgeCooldown)
         {
             return;
         }
-        ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
-        GameObject bullet = Instantiate(BulletPrefab, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
-        bullet.GetComponent<PlayerBulletScript>().Damage = Damage;
-        bullet.GetComponent<PlayerBulletScript>().Player = gameObject.GetComponent<PlayerController>(); // test this
-        bullet.GetComponent<Rigidbody2D>().AddForce(ShootingPoint.transform.right * BulletSpeed * Time.deltaTime, ForceMode2D.Impulse);
+        Rb.AddForce(Rb.velocity * 5f, ForceMode2D.Impulse);
+        lastDodgeTime = Time.time;
+    }
+
+    private void Shoot()
+    {
+        if ((Time.time - lastShotTime) < shootingCooldown)
+        {
+            return;
+        }
+        SpawnBulletServerRpc(bulletTag);
         lastShotTime = Time.time;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SpawnBulletServerRpc(string bulletOwnerTag)
+    {
+        //ParticleSystem MuzzleFlashGameObject = ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
+        //NetworkObject MuzzleFlashGameObjectNetorkObject = MuzzleFlashGameObject.GetComponent<NetworkObject>();
+        //MuzzleFlashGameObjectNetorkObject.Spawn(true);
+        SpawnShootingAudioAndVisualCuesClientRpc();
+        GameObject bullet = Instantiate(BulletPrefab, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
+        NetworkObject bulletNetworkObject = bullet.GetComponent<NetworkObject>();
+        bulletNetworkObject.Spawn(true);
+        PlayerBulletScript bulletGameObjectPlayerBulletScript = bullet.GetComponent<PlayerBulletScript>();
+        bulletGameObjectPlayerBulletScript.Damage = Damage;
+        bulletGameObjectPlayerBulletScript.ChangeBulletSpriteAndMaterial(bulletTag);
+        bullet.GetComponent<Rigidbody2D>().AddForce(ShootingPoint.transform.right * BulletSpeed * Time.deltaTime, ForceMode2D.Impulse);
+    }
+
+    [ClientRpc]
+    private void SpawnShootingAudioAndVisualCuesClientRpc()
+    {
+        ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
+        soundEffectManager.PlaySound(soundEffectManager.SFXRefs.PlayerShot, ShootingPoint.transform.position);
     }
 
     public void GetHurt(int damage)
     {
         CurrentHealthPoints -= damage;
         interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
-        Debug.Log("Ouch! Current HP: " + CurrentHealthPoints);
         damageVFX.CallDamageEffect();
     }
 
@@ -154,27 +152,85 @@ public class PlayerController : MonoBehaviour
     void DisplaceCamera()
     {
         cameraTargetPosition = (Rb.position + mousePosition) / 2f;
-
         cameraTargetPosition.x = Mathf.Clamp(cameraTargetPosition.x, -cameraThreshold + Rb.position.x, cameraThreshold + Rb.position.x);
         cameraTargetPosition.y = Mathf.Clamp(cameraTargetPosition.y, -cameraThreshold + Rb.position.y, cameraThreshold + Rb.position.y);
         cameraTargetPosition.z = -9f;
 
-        playerCamera.transform.position = cameraTargetPosition;
+        PlayerCamera.transform.position = cameraTargetPosition;
+    }
+
+    private void Awake()
+    {
+        playerControls = new InputActions();
+        // Subscribe to the actions that are button type
+        // playerControls.Player.Attack.performed += Shoot;
+        playerControls.Player.Dodge.performed += Dodge;
+    }
+
+    private void OnEnable()
+    {
+        //playerControls.Player.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls.Player.Disable();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if ((IsServer && IsOwner) || (!IsServer && !IsOwner))
+        {
+            gameObject.tag = "Player_1";
+            bulletTag = "Player_1_Bullet";
+            animator.runtimeAnimatorController = playerSpritesReferences.Player1Animator;
+            Hand.GetComponentInChildren<SpriteRenderer>().sprite = playerSpritesReferences.Player1GunSprite;
+        }
+        else if ((IsServer && !IsOwner) || (!IsServer && IsOwner))
+        {
+            gameObject.tag = "Player_2";
+            bulletTag = "Player_2_Bullet";
+            animator.runtimeAnimatorController = playerSpritesReferences.Player2Animator;
+            Hand.GetComponentInChildren<SpriteRenderer>().sprite = playerSpritesReferences.Player2GunSprite;
+        }
+
+        if (IsOwner)
+        {
+            PlayerCamera.transform.gameObject.SetActive(true);
+            playerControls.Player.Enable();
+        }
+        base.OnNetworkSpawn();
     }
 
     // Start is called before the first frame update
     void Start()
     {
         damageVFX = GetComponent<DamageEffect>();
+        soundEffectManager = GameObject.Find("SoundManager").GetComponent<SoundEffectManager>();
+        if(!IsOwner)
+        {
+            return;
+        }
+        interfaceScript = GameObject.Find("User Interface").GetComponent<InGameUIScript>();
         CurrentHealthPoints = MaxHealthPoints;
         interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        mousePosition = playerCamera.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
-        //mousePosition = Camera.main.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
+        if(!IsOwner)
+        {
+            return;
+        }
+        /*
+        if (!canMove)
+        {
+            return;
+        }
+        */
+        mousePosition = PlayerCamera.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
         AnimatePlayer();
         DisplaceCamera();
         AimWeapon();
@@ -184,6 +240,16 @@ public class PlayerController : MonoBehaviour
     // FixedUpdate is called at a fixed rate, used for physics
     private void FixedUpdate()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
+        /*
+        if (!canMove)
+        {
+            return;
+        }
+        */
         movementDirection = playerControls.Player.Move.ReadValue<Vector2>().normalized;
         // rb.velocity = movementDirection * movementSpeed * Time.deltaTime;
         Vector2 force = movementDirection * MovementSpeed * Time.deltaTime;

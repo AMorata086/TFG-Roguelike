@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     // Define a simple state machine to control the current state
     private enum State
@@ -13,7 +14,7 @@ public class GameManager : MonoBehaviour
         ReachedGoal
     }
 
-    private struct Wave
+    private struct Wave : INetworkSerializeByMemcpy
     {
         // public int numberOfWaves;
         public int[] enemiesInWave;
@@ -53,7 +54,7 @@ public class GameManager : MonoBehaviour
             // retrieve the max number of enemies per room
             int maxNumberOfEnemies = rooms[i].spawnPoints.Length;
             // fill in the wave with enemies
-            wavesInRoom[i] = new Wave[rooms[i].numberOfWaves/*enemiesInWave.Length*/];
+            wavesInRoom[i] = new Wave[rooms[i].numberOfWaves];
             // iterate each wave in that specific room
             for (int j = 0; j < rooms[i].numberOfWaves; j++)
             {
@@ -69,6 +70,12 @@ public class GameManager : MonoBehaviour
 
     public void DecrementCurrentEnemies()
     {
+        DecrementCurrentEnemiesServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DecrementCurrentEnemiesServerRpc()
+    {
         currentEnemies--;
     }
 
@@ -77,7 +84,7 @@ public class GameManager : MonoBehaviour
     {
         currentState = State.InBattle;
         // close the doors when the player enters the room
-        doorManager.SwitchDoorState();
+        SwitchDoorsStateClientRpc();
         
         for(int i = 0; i < rooms[roomNumber].numberOfWaves; i++)
         {
@@ -88,13 +95,19 @@ public class GameManager : MonoBehaviour
                 switch (wavesInRoom[roomNumber][i].enemiesInWave[j])
                 {
                     case 1:
-                        Instantiate(enemyMelee, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        GameObject enemyMeleeSpawned = Instantiate(enemyMelee, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        NetworkObject enemyMeleeSpawnedNetworkObject = enemyMeleeSpawned.GetComponent<NetworkObject>();
+                        enemyMeleeSpawnedNetworkObject.Spawn(true);
                         break;
                     case 2:
-                        Instantiate(enemyRanged, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        GameObject enemyRangedSpawned = Instantiate(enemyRanged, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        NetworkObject enemyRangedSpawnedNetworkObject = enemyRangedSpawned.GetComponent<NetworkObject>();
+                        enemyRangedSpawnedNetworkObject.Spawn(true);
                         break;
                     case 3:
-                        Instantiate(enemyFlying, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        GameObject enemyFlyingSpawned = Instantiate(enemyFlying, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        NetworkObject enemyFlyingSpawnedNetworkObject = enemyFlyingSpawned.GetComponent<NetworkObject>();
+                        enemyFlyingSpawnedNetworkObject.Spawn(true);
                         break;
                 }
             }
@@ -107,28 +120,32 @@ public class GameManager : MonoBehaviour
         }
 
         // open the doors when all enemies have been killed
-        doorManager.SwitchDoorState();
+        SwitchDoorsStateClientRpc();
         currentState = State.Idle;
 
         yield return null;
     }
+
+    [ClientRpc]
+    private void SwitchDoorsStateClientRpc()
+    {
+        doorManager.SwitchDoorState();
+    }
+    
 
     private void Awake()
     {
         currentState = State.Idle;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
+        if (!IsServer)
+        {
+            return;
+        }
         InitializeRooms();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    
 }

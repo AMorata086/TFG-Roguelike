@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class HealthPackScript: MonoBehaviour
+public class HealthPackScript: NetworkBehaviour
 {
     [SerializeField] private int totalHealth;
     [SerializeField] private int healthPerTick;
@@ -15,12 +16,22 @@ public class HealthPackScript: MonoBehaviour
 
     public int GetHealth()
     {
+        if(!IsHost)
+        {
+            return 0;
+        }
         totalHealth -= healthPerTick;
-        damageVfx.CallDamageEffect();
+        InvokeDamageVfxClientRpc();
         if (totalHealth <= 0)
         {
             Destroy(gameObject);
         }
         return healthPerTick;
+    }
+
+    [ClientRpc]
+    private void InvokeDamageVfxClientRpc()
+    {
+        damageVfx.CallDamageEffect();
     }
 }

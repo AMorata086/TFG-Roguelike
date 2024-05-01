@@ -1,8 +1,9 @@
 using Pathfinding;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class EnemyFlyingController : MonoBehaviour
+public class EnemyFlyingController : NetworkBehaviour
 {
     /* VARIABLES */
     // Enemy stats

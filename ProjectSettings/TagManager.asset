@@ -6,12 +6,16 @@ TagManager:
   tags:
   - Enemy
   - Environment
-  - Player_Projectile
   - Enemy_Projectile
   - Enemy_Flying
   - Enemy_Melee
   - Enemy_Ranged
   - Health_Pack
+  - Player_1
+  - Player_2
+  - Player_1_Bullet
+  - Player_2_Bullet
+  - Player_Projectile
   layers:
   - Default
   - TransparentFX

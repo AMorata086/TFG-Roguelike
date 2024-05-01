@@ -1,10 +1,9 @@
 using Pathfinding;
 using System.Collections;
-using Unity.VisualScripting;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class EnemyRangeController : MonoBehaviour
+public class EnemyRangeController : NetworkBehaviour
 {
     /* VARIABLES */
     // Enemy stats

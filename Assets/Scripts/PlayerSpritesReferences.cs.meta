@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d6036d0216c95cb4fa6ae7b7422d1346
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Player1Sprite: {instanceID: 0}
+  - Player2Sprite: {instanceID: 0}
+  - Player1BulletSprite: {instanceID: 0}
+  - Player2BulletSprite: {instanceID: 0}
+  - Player1BulletMaterial: {instanceID: 0}
+  - Player2BulletMaterial: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

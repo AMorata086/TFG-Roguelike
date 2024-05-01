@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 51d04a304b853dd40b15857da94e57d8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - PlayerShot: {instanceID: 0}
+  - EnemyRangedShot: {instanceID: 0}
+  - EnemyDroneShot: {instanceID: 0}
+  - PlayerHurt: {instanceID: 0}
+  - EnemyHurt: {instanceID: 0}
+  - EnemyDies: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

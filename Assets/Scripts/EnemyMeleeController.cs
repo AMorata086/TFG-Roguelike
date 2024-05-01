@@ -1,8 +1,9 @@
 using Pathfinding;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class EnemyMeleeController : MonoBehaviour
+public class EnemyMeleeController : NetworkBehaviour
 {
     /* VARIABLES */
     // Enemy Stats

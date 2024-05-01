@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7041333711755340031}
   - component: {fileID: 195571039365030096}
   - component: {fileID: 2765634742329276678}
+  - component: {fileID: -5927620263564843595}
   m_Layer: 0
   m_Name: projectile_enemy_medium
   m_TagString: Enemy_Projectile
@@ -172,4 +173,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forceOfImpact: 500
+  Damage: 0
   ImpactParticlesPrefab: {fileID: 5844187431685392213, guid: ecb4ac385c5841d47b2c8d8fc317b74e, type: 3}
+--- !u!114 &-5927620263564843595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4640215982234866757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1

@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class RoomManager : MonoBehaviour
+public class RoomManager : NetworkBehaviour
 {
     [SerializeField] private int roomNumber;
     [SerializeField] private GameManager gameManager;
@@ -15,9 +16,27 @@ public class RoomManager : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            spawnEnemiesCoroutine = StartCoroutine(gameManager.SpawnEnemies(roomNumber));
+            StartSpawnEnemiesCoroutineServerRpc();
 
-            gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            DisableRoomColliderServerRpc();
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void StartSpawnEnemiesCoroutineServerRpc()
+    {
+        spawnEnemiesCoroutine = StartCoroutine(gameManager.SpawnEnemies(roomNumber));
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DisableRoomColliderServerRpc()
+    {
+        DisableRoomColliderClientRpc();
+    }
+
+    [ClientRpc]
+    private void DisableRoomColliderClientRpc()
+    {
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
     }
 }
