@@ -178,7 +178,9 @@ GameObject:
   - component: {fileID: 4698580817060413199}
   - component: {fileID: 3989087684954840069}
   - component: {fileID: -2083079297828360025}
-  - component: {fileID: -1291635250737206780}
+  - component: {fileID: 5901772275619272659}
+  - component: {fileID: -8403885010681174285}
+  - component: {fileID: 6594178109817789488}
   m_Layer: 0
   m_Name: Enemy_flying
   m_TagString: Untagged
@@ -469,7 +471,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &-1291635250737206780
+--- !u!114 &5901772275619272659
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -478,7 +480,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6970763896357816480}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a67c4491ed5c084c8c1ef38bfa4d037, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -499,6 +501,32 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-8403885010681174285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6970763896357816480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6594178109817789488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6970763896357816480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 8975761138816076492}
 --- !u!1 &9144482705293545111
 GameObject:
   m_ObjectHideFlags: 0

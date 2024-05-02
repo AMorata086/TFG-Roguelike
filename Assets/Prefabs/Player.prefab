@@ -184,6 +184,7 @@ MonoBehaviour:
   MovementSpeed: 3000
   MaxHealthPoints: 10
   Damage: 2
+  dodgeStrength: 750
   Rb: {fileID: 7476635088602437103}
   Hand: {fileID: 2493990819836048051}
   ShootingPoint: {fileID: 1988089586125313239}
@@ -721,7 +722,7 @@ GameObject:
   - component: {fileID: 5205107897448975092}
   m_Layer: 0
   m_Name: Hitbox
-  m_TagString: Player
+  m_TagString: Player_Hitbox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -11,6 +11,9 @@ public class PlayerController : NetworkBehaviour
     private int CurrentHealthPoints = 10;
     public int Damage = 2;
     private bool canMove = false;
+    [SerializeField] private float dodgeStrength = 750f;
+    private float invulnerabilityTime = 0.25f;
+    private float lastTimeGotHurt = 0f;
 
     // variables for player movement
     private Vector2 movementDirection;
@@ -23,7 +26,7 @@ public class PlayerController : NetworkBehaviour
     public GameObject ShootingPoint;
     public GameObject BulletPrefab;
     private string bulletTag = "";
-    public float BulletSpeed = 750f;
+    public float BulletSpeed = 1000f;
     public ParticleSystem MuzzleFlash;
 
     [SerializeField] private ParticleSystem deathVFX;
@@ -55,7 +58,7 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        Rb.AddForce(Rb.velocity * 5f, ForceMode2D.Impulse);
+        Rb.AddForce(Rb.velocity.normalized * dodgeStrength * Time.fixedDeltaTime, ForceMode2D.Impulse);
         lastDodgeTime = Time.time;
     }
 
@@ -92,11 +95,29 @@ public class PlayerController : NetworkBehaviour
         soundEffectManager.PlaySound(soundEffectManager.SFXRefs.PlayerShot, ShootingPoint.transform.position);
     }
 
-    public void GetHurt(int damage)
+    public void GetHurt(int damageReceived)
     {
-        CurrentHealthPoints -= damage;
-        interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+        if(!IsServer)
+        {
+            return;
+        }
+
+        if((Time.time - lastTimeGotHurt) < invulnerabilityTime)
+        {
+            return;
+        }
+        GetHurtClientRpc(damageReceived);
+        lastTimeGotHurt = Time.time;
+        
+    }
+
+    [ClientRpc]
+    private void GetHurtClientRpc(int damageReceived)
+    {
+        CurrentHealthPoints -= damageReceived;
+        //interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
         damageVFX.CallDamageEffect();
+        Debug.Log(gameObject.tag + " current HP = " + CurrentHealthPoints);
     }
 
     public void Heal(int healthRestored)

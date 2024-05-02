@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu()]
 public class PlayerSpritesReferences : ScriptableObject
 {
     [Header("Player 1 Assets")]

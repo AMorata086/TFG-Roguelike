@@ -19,24 +19,39 @@ public class EnemyBulletScript : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(!IsServer)
+        {
+            return;
+        }
+
         switch (collision.gameObject.tag)
         {
             case "Environment":
-                TriggerParticleEffects();
+                InstantiateParticleEffectsClientRpc();
                 Destroy(gameObject);
                 break;
-            case "Player":
+            case "Player_Hitbox":
                 collision.gameObject.GetComponentInParent<PlayerController>().GetHurt(Damage);
                 collision.gameObject.GetComponentInParent<Rigidbody2D>().AddForce(forceOfImpact * Time.fixedDeltaTime * gameObject.GetComponent<Rigidbody2D>().velocity.normalized, ForceMode2D.Impulse);
-                TriggerParticleEffects();
+                InstantiateParticleEffectsClientRpc();
                 Destroy(gameObject);
                 break;
-            case "Player_Projectile":
-                TriggerParticleEffects();
+            case "Player_1_Bullet":
+                InstantiateParticleEffectsClientRpc();
+                Destroy(gameObject);
+                break;
+            case "Player_2_Bullet":
+                InstantiateParticleEffectsClientRpc();
                 Destroy(gameObject);
                 break;
             default:
                 break;
         }
+    }
+
+    [ClientRpc]
+    private void InstantiateParticleEffectsClientRpc()
+    {
+        TriggerParticleEffects();
     }
 }

@@ -178,7 +178,9 @@ GameObject:
   - component: {fileID: 5388969541494455597}
   - component: {fileID: 8948650052214506691}
   - component: {fileID: -2580130063285379832}
-  - component: {fileID: -969001712889979037}
+  - component: {fileID: 3381163822593017823}
+  - component: {fileID: -7441538970275203713}
+  - component: {fileID: -8242056684467444836}
   m_Layer: 0
   m_Name: Enemy_melee
   m_TagString: Untagged
@@ -390,7 +392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HealthPoints: 10
   damage: 1
-  knockbackForce: 500
+  knockbackForce: 1500
   MovementSpeed: 2000
   Rb: {fileID: 4183626379812194677}
   Animator: {fileID: 8519871073452827978}
@@ -464,7 +466,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &-969001712889979037
+--- !u!114 &3381163822593017823
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -473,7 +475,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9198145753397688233}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a67c4491ed5c084c8c1ef38bfa4d037, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -494,3 +496,29 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-7441538970275203713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9198145753397688233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-8242056684467444836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9198145753397688233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 8519871073452827978}

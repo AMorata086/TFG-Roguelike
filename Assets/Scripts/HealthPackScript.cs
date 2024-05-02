@@ -20,14 +20,16 @@ public class HealthPackScript: NetworkBehaviour
         {
             return 0;
         }
-        totalHealth -= healthPerTick;
         InvokeDamageVfxClientRpc();
+        totalHealth -= healthPerTick;
         if (totalHealth <= 0)
         {
             Destroy(gameObject);
         }
         return healthPerTick;
     }
+
+
 
     [ClientRpc]
     private void InvokeDamageVfxClientRpc()

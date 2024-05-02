@@ -56,6 +56,8 @@ public class EnemyRangeController : NetworkBehaviour
         GameObject bullet = Instantiate(BulletPrefab, shootingPoint.position, Quaternion.Euler(new Vector3 (0f, 0f, shootingAngle)));
         bullet.GetComponent<Rigidbody2D>().AddForce(shootingDirection * BulletSpeed * Time.fixedDeltaTime, ForceMode2D.Impulse);
         bullet.GetComponent<EnemyBulletScript>().Damage = Damage;
+        NetworkObject bulletGameObjectNetworkObject = bullet.GetComponent<NetworkObject>();
+        bulletGameObjectNetworkObject.Spawn(true);
         lastShotTime = Time.time;
     }
 
@@ -69,7 +71,11 @@ public class EnemyRangeController : NetworkBehaviour
     {
         spawnEffect.CallSpawnEffect();
         yield return new WaitForSeconds(1);
-        InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+        if (IsServer)
+        {
+            InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+
+        }
         yield return null;
     }
 
@@ -78,21 +84,50 @@ public class EnemyRangeController : NetworkBehaviour
         if (HealthPoints <= 0)
         {
             gameManager.DecrementCurrentEnemies();
-            ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
-            ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+            InstantiateDeathVfxClientRpc();
             Destroy(gameObject);
         }
     }
 
-    private GameObject FindTarget()
+    [ClientRpc]
+    private void InstantiateDeathVfxClientRpc()
     {
-        GameObject[] targets = GameObject.FindGameObjectsWithTag("Player");
+        ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
+        ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+    }
+
+    private Transform FindTarget()
+    {
+        GameObject[] targets = GameObject.FindGameObjectsWithTag("Player_Hitbox");
+        Transform finalTarget;
 
         if (targets == null)
         {   // Control if there are any errors when searching for a target
             return null;
         }
-        return targets[Random.Range(0, targets.Length)];
+
+        // Pursue the nearest target
+        if (targets.Length > 1)
+        {
+            float distanceToTarget1 = Mathf.Abs(Vector2.Distance(targets[0].GetComponentInParent<Rigidbody2D>().position, Rb.position));
+            float distanceToTarget2 = Mathf.Abs(Vector2.Distance(targets[1].GetComponentInParent<Rigidbody2D>().position, Rb.position));
+
+            if (distanceToTarget1 < distanceToTarget2)
+            {
+                finalTarget = targets[0].transform;
+            }
+            else
+            {
+                finalTarget = targets[1].transform;
+            }
+        }
+        else
+        {
+            finalTarget = targets[0].transform;
+        }
+
+        Debug.Log("Target is --> " + finalTarget.parent.tag);
+        return finalTarget;
     }
 
     private void AnimateEnemy()
@@ -142,16 +177,26 @@ public class EnemyRangeController : NetworkBehaviour
     void Start()
     {
         Coroutine spawnCoroutine = StartCoroutine(PerformSpawn());
+        damageVFX = GetComponent<DamageEffect>();
 
-        target = FindTarget().transform;
+        if (!IsServer)
+        {
+            return;
+        }
+
+        target = FindTarget();
         seeker = GetComponent<Seeker>();
         shootingPoint = AimPoint.transform.GetChild(0);
-        damageVFX = GetComponent<DamageEffect>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         distanceToTarget = Vector2.Distance(Rb.position, target.position);
         if (distanceToTarget > TargetDetectionDistance)
         {
@@ -176,6 +221,11 @@ public class EnemyRangeController : NetworkBehaviour
 
     void FixedUpdate()
     {
+        if(!IsServer)
+        {
+            return;
+        }
+
         if (path == null)
         {
             return;

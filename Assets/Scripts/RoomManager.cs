@@ -14,7 +14,7 @@ public class RoomManager : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
+        if (collision.CompareTag("Player_Hitbox"))
         {
             StartSpawnEnemiesCoroutineServerRpc();
 

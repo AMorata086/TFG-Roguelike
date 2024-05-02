@@ -10,7 +10,7 @@ public class EnemyMeleeController : NetworkBehaviour
     [Header("Enemy Stats")]
     public int HealthPoints = 10;
     [SerializeField] private int damage = 5;
-    [SerializeField] private float knockbackForce = 1000f;
+    [SerializeField] private float knockbackForce = 2000f;
     public float MovementSpeed = 2500f;
     public Rigidbody2D Rb;
 
@@ -39,6 +39,12 @@ public class EnemyMeleeController : NetworkBehaviour
     public void GetHurt(int damageReceived)
     {
         HealthPoints -= damageReceived;
+        InstantiateDamageVfxClientRpc();
+    }
+
+    [ClientRpc]
+    private void InstantiateDamageVfxClientRpc()
+    {
         damageVFX.CallDamageEffect();
     }
 
@@ -46,7 +52,11 @@ public class EnemyMeleeController : NetworkBehaviour
     {
         spawnEffect.CallSpawnEffect();
         yield return new WaitForSeconds(1);
-        InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+        if(IsServer)
+        {
+            InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
+
+        }
         yield return null;
     }
 
@@ -55,10 +65,16 @@ public class EnemyMeleeController : NetworkBehaviour
         if (HealthPoints <= 0)
         {
             gameManager.DecrementCurrentEnemies();
-            ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
-            ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+            InstantiateDeathVfxClientRpc();
             Destroy(gameObject);
         }
+    }
+
+    [ClientRpc]
+    private void InstantiateDeathVfxClientRpc()
+    {
+        ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
+        ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
     }
 
     private void AttackTarget(Collider2D collision)
@@ -66,27 +82,79 @@ public class EnemyMeleeController : NetworkBehaviour
         // invoke the GetHurt method from the player's controller
         collision.gameObject.GetComponentInParent<PlayerController>().GetHurt(damage);
         // Apply a knockback to the player when in contact with the enemy
-        collision.gameObject.GetComponentInParent<Rigidbody2D>().AddForce(gameObject.GetComponent<Rigidbody2D>().velocity.normalized * knockbackForce * Time.fixedDeltaTime, ForceMode2D.Impulse);
+        NetworkObject playerHitNetworkObject = collision.gameObject.GetComponentInParent<NetworkObject>();
+
+        Vector2 knockbackForceApplied = gameObject.GetComponent<Rigidbody2D>().velocity.normalized * knockbackForce * Time.fixedDeltaTime;
+
+        AddKnockbackForceClientRpc(playerHitNetworkObject, knockbackForceApplied);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    [ClientRpc]
+    private void AddKnockbackForceClientRpc(NetworkObjectReference playerHitNetworkObjectReference, Vector2 knockbackForceAppliedToTarget)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if(!IsOwner)
+        {
+            return;
+        }
+
+        if(playerHitNetworkObjectReference.TryGet(out NetworkObject targetPlayerNetworkObject))
+        {
+            Rigidbody2D targetPlayerRigidbody = targetPlayerNetworkObject.gameObject.GetComponentInParent<Rigidbody2D>();
+            Debug.Log("Force applied to target: " + knockbackForceAppliedToTarget);
+            targetPlayerRigidbody.AddForce(knockbackForceAppliedToTarget, ForceMode2D.Impulse);
+        }
+        else
+        {
+            Debug.Log("Error: Couldn't find target player Network Object");
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) 
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        if (collision.gameObject.CompareTag("Player_Hitbox"))
         {
             // Attack the player
             AttackTarget(collision);
         }
     }
 
-    private GameObject FindTarget()
+    private Transform FindTarget()
     {
-        GameObject[] targets = GameObject.FindGameObjectsWithTag("Player");
+        GameObject[] targets = GameObject.FindGameObjectsWithTag("Player_Hitbox");
+        Transform finalTarget;
 
         if (targets == null)
         {   // Control if there are any errors when searching for a target
             return null;
         }
-        return targets[Random.Range(0, targets.Length)];
+
+        // Pursue the nearest target
+        if (targets.Length > 1)
+        {
+            float distanceToTarget1 = Mathf.Abs(Vector2.Distance(targets[0].GetComponentInParent<Rigidbody2D>().position, Rb.position));
+            float distanceToTarget2 = Mathf.Abs(Vector2.Distance(targets[1].GetComponentInParent<Rigidbody2D>().position, Rb.position));
+
+            if (distanceToTarget1 < distanceToTarget2)
+            {
+                 finalTarget = targets[0].transform;
+            }
+            else
+            {
+                finalTarget = targets[1].transform;
+            }
+        }
+        else
+        {
+            finalTarget = targets[0].transform;
+        }
+
+        Debug.Log("Target is --> " + finalTarget.parent.tag);
+        return finalTarget;
     }
 
     private void OnPathComplete(Path p)
@@ -134,14 +202,24 @@ public class EnemyMeleeController : NetworkBehaviour
     private void Start()
     {
         Coroutine spawnCoroutine = StartCoroutine(PerformSpawn());
-        
-        target = FindTarget().transform;
-        seeker = GetComponent<Seeker>();
         damageVFX = GetComponent<DamageEffect>();
+
+        if (!IsServer)
+        {
+            return;
+        }
+
+        target = FindTarget();
+        seeker = GetComponent<Seeker>();
     }
 
     private void Update()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         distanceToTarget = Vector2.Distance(Rb.position, target.position);
         if (distanceToTarget <= TargetDetectionDistance)
         {
@@ -154,6 +232,11 @@ public class EnemyMeleeController : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if(!IsServer)
+        {
+            return;
+        }
+
         if (path == null)
         {
             return;

@@ -30,31 +30,19 @@ public class PlayerBulletScript : NetworkBehaviour
         switch (BulletOwnerTag)
         {
             case "Player_1_Bullet":
-                Debug.Log("Pasa por el Player 1");
                 bulletSpriteRenderer.sprite = playerSpritesReferences.Player1BulletSprite;
                 bulletSpriteRenderer.material = playerSpritesReferences.Player1BulletMaterial;
                 break;
             case "Player_2_Bullet":
-                Debug.Log("Pasa por el Player 2");
                 bulletSpriteRenderer.sprite = playerSpritesReferences.Player2BulletSprite;
                 bulletSpriteRenderer.material = playerSpritesReferences.Player2BulletMaterial;
                 break;
         }
     }
 
-    [ClientRpc]
-    void TriggerParticleEffectsClientRpc()
-    {
-        Quaternion qAngle = gameObject.transform.rotation;
-        Vector3 eAngles = qAngle.eulerAngles;
-        eAngles = new Vector3(-eAngles.z, 90, 0);
-        ParticleSystem ImpactParticles = ParticleSystem.Instantiate(ImpactParticlesPrefab, gameObject.transform.position, Quaternion.Euler(eAngles));
-        ImpactParticles.transform.localScale = new Vector3(1, 1, -1);
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!IsHost)
+        if (!IsServer)
         {
             return;
         }
@@ -98,5 +86,15 @@ public class PlayerBulletScript : NetworkBehaviour
             default:
                 break;
         }
+    }
+
+    [ClientRpc]
+    void TriggerParticleEffectsClientRpc()
+    {
+        Quaternion qAngle = gameObject.transform.rotation;
+        Vector3 eAngles = qAngle.eulerAngles;
+        eAngles = new Vector3(-eAngles.z, 90, 0);
+        ParticleSystem ImpactParticles = ParticleSystem.Instantiate(ImpactParticlesPrefab, gameObject.transform.position, Quaternion.Euler(eAngles));
+        ImpactParticles.transform.localScale = new Vector3(1, 1, -1);
     }
 }
