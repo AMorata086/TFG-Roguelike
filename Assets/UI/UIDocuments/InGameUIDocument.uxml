@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Styles/InGameUSS.uss?fileID=7433441132597879392&amp;guid=85eed14bdc2d939469683c37c80c94fa&amp;type=3#InGameUSS" />
-    <ui:VisualElement name="MainContainer" class="MainContainer" style="display: none;">
+    <ui:VisualElement name="MainContainer" class="MainContainer" style="display: flex;">
         <ui:VisualElement name="PlayerInfo" class="PlayerInfo">
             <ui:VisualElement name="PortraitContainer" class="PortraitContainer" style="flex-grow: 1;">
-                <ui:VisualElement name="PlayerPortrait" class="PlayerPortrait" style="width: 75%; height: 50%;" />
+                <ui:VisualElement name="PlayerPortrait" class="PlayerPortrait" />
             </ui:VisualElement>
             <ui:VisualElement name="HealthInfo" class="HealthInfo">
                 <ui:VisualElement name="NameContainer" class="NameContainer">
@@ -15,8 +15,17 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="OtherPlayerInfo" class="OtherPlayerInfo">
+            <ui:VisualElement name="OtherPlayerPortraitContainer" class="OtherPlayerPortraitContainer" style="height: auto; flex-grow: 1;">
+                <ui:VisualElement name="OtherPlayerPortrait" class="OtherPlayerPortrait" style="width: 55%; height: 45%;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="OtherPlayerHealthBarContainer" class="OtherPlayerHealthBarContainer" style="width: 75%;">
+                <ui:VisualElement class="OtherPlayerLabelHealth" />
+                <ui:ProgressBar value="5" title="5/20" name="OtherPlayerHealthPoints" focusable="false" high-value="20" class="OtherPlayerHPBar" />
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement name="MultiplayerButtonsContainer" class="MainContainer" style="display: flex; justify-content: center; align-items: center; background-color: rgb(20, 20, 20);">
+    <ui:VisualElement name="MultiplayerButtonsContainer" class="MainContainer" style="display: none; justify-content: center; align-items: center; background-color: rgb(20, 20, 20);">
         <ui:Button text="Start as Host" parse-escape-sequences="true" display-tooltip-when-elided="true" name="StartHost" style="width: 20%; margin-top: 1.5%; margin-right: 1.5%; margin-bottom: 1.5%; margin-left: 1.5%; background-color: rgb(20, 20, 20); color: rgb(255, 255, 255);" />
         <ui:Button text="Start as Client" parse-escape-sequences="true" display-tooltip-when-elided="true" name="StartClient" style="width: 20%; margin-top: 1.5%; margin-right: 1.5%; margin-bottom: 1.5%; margin-left: 1.5%; background-color: rgb(20, 20, 20); color: rgb(255, 255, 255);" />
     </ui:VisualElement>

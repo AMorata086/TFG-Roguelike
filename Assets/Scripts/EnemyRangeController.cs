@@ -64,6 +64,12 @@ public class EnemyRangeController : NetworkBehaviour
     public void GetHurt(int damageReceived)
     {
         HealthPoints -= damageReceived;
+        InstantiateDamageVfxClientRpc();
+    }
+
+    [ClientRpc]
+    private void InstantiateDamageVfxClientRpc()
+    {
         damageVFX.CallDamageEffect();
     }
 

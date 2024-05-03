@@ -7,7 +7,6 @@ public class PlayerBulletScript : NetworkBehaviour
     public float forceOfImpact = 500f;
     public int Damage = 0;
     public ParticleSystem ImpactParticlesPrefab;
-    public string BulletOwnerTag;
     [SerializeField] private PlayerSpritesReferences playerSpritesReferences;
     private SpriteRenderer bulletSpriteRenderer;
 
@@ -26,8 +25,9 @@ public class PlayerBulletScript : NetworkBehaviour
     [ClientRpc]
     private void ChangeSpriteRendererClientRpc(string bulletOwnerTag)
     {
-        BulletOwnerTag = bulletOwnerTag;
-        switch (BulletOwnerTag)
+        gameObject.tag = bulletOwnerTag;
+        Debug.Log("Tag of the bullet fired --> " + gameObject.tag);
+        switch (gameObject.tag)
         {
             case "Player_1_Bullet":
                 bulletSpriteRenderer.sprite = playerSpritesReferences.Player1BulletSprite;
@@ -80,7 +80,36 @@ public class PlayerBulletScript : NetworkBehaviour
                 break;
             case "Health_Pack":
                 TriggerParticleEffectsClientRpc();
-                //Player.Heal(collision.gameObject.GetComponent<HealthPackScript>().GetHealth());
+                HealthPackScript healthPackScript = collision.gameObject.GetComponent<HealthPackScript>();
+                if(healthPackScript == null)
+                {
+                    Debug.LogError("Error: couldn't find HealthPackScript component in the collided GameObject");
+                    return;
+                }
+                string playerTag = "";
+                switch(gameObject.tag)
+                {
+                    case "Player_1_Bullet":
+                        playerTag = "Player_1";
+                        break;
+                    case "Player_2_Bullet":
+                        playerTag = "Player_2";
+                        break;
+                }
+                GameObject playerGameObject = GameObject.FindGameObjectWithTag(playerTag);
+                if(playerGameObject == null)
+                {
+                    Debug.LogError("Error: couldn't find desired player GameObject");
+                    return;
+                }
+                PlayerController playerGameObjectPlayerController = playerGameObject.GetComponent<PlayerController>();
+                if(playerGameObjectPlayerController == null)
+                {
+                    Debug.LogError("Error: couldn't find PlayerController component in Player GameObject");
+                    return;
+                }
+                playerGameObjectPlayerController.Heal(healthPackScript.GetHealth());
+
                 Destroy(gameObject);
                 break;
             default:

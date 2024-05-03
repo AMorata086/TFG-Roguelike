@@ -14,7 +14,7 @@ public class GameManager : NetworkBehaviour
         ReachedGoal
     }
 
-    private struct Wave : INetworkSerializeByMemcpy
+    private struct Wave
     {
         // public int numberOfWaves;
         public int[] enemiesInWave;
@@ -44,6 +44,9 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private DoorManager doorManager;
     [SerializeField] private RoomManager[] rooms;
     private Wave[][] wavesInRoom;
+    [SerializeField] private GameObject healthPackPrefab;
+    private GameObject[] healthPacks = new GameObject[2];
+    [SerializeField] private Vector3[] healthPackPositions = new Vector3[2];
 
     private void InitializeRooms()
     {
@@ -147,5 +150,12 @@ public class GameManager : NetworkBehaviour
             return;
         }
         InitializeRooms();
+        for(int i = 0; i < healthPacks.Length; i++)
+        {
+            healthPacks[i] = Instantiate(healthPackPrefab);
+            healthPacks[i].transform.position = healthPackPositions[i];
+            NetworkObject healthPackNetworkObject = healthPacks[i].GetComponent<NetworkObject>();
+            healthPackNetworkObject.Spawn(true);
+        }
     }
 }

@@ -16,7 +16,7 @@ public class HealthPackScript: NetworkBehaviour
 
     public int GetHealth()
     {
-        if(!IsHost)
+        if(!IsServer)
         {
             return 0;
         }

@@ -122,18 +122,29 @@ public class PlayerController : NetworkBehaviour
 
     public void Heal(int healthRestored)
     {
+        int healthPointsAfterHealing = 0;
+        Debug.Log("Before healing: " + CurrentHealthPoints);
         // Control the health points not overflowing the Max Health value
         if ((((CurrentHealthPoints + healthRestored) % MaxHealthPoints) == (CurrentHealthPoints + healthRestored)) ||
             (((CurrentHealthPoints + healthRestored) % MaxHealthPoints) == 0))
         {
-            CurrentHealthPoints += healthRestored;
+            healthPointsAfterHealing = CurrentHealthPoints + healthRestored;
         } 
         else
         {
             int mod = (CurrentHealthPoints + healthRestored) % MaxHealthPoints;
-            CurrentHealthPoints += healthRestored - mod;
+            healthPointsAfterHealing = CurrentHealthPoints + healthRestored - mod;
         }
-        interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+        HealClientRpc(healthPointsAfterHealing);
+
+        //interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+    }
+
+    [ClientRpc]
+    private void HealClientRpc(int healthPointsAfterHealing)
+    {
+        CurrentHealthPoints = healthPointsAfterHealing;
+        Debug.Log("After healing: " + CurrentHealthPoints);
     }
 
     private void PerformDeath()

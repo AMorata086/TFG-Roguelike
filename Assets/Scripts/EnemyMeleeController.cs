@@ -92,13 +92,12 @@ public class EnemyMeleeController : NetworkBehaviour
     [ClientRpc]
     private void AddKnockbackForceClientRpc(NetworkObjectReference playerHitNetworkObjectReference, Vector2 knockbackForceAppliedToTarget)
     {
-        if(!IsOwner)
-        {
-            return;
-        }
-
         if(playerHitNetworkObjectReference.TryGet(out NetworkObject targetPlayerNetworkObject))
         {
+            if (!targetPlayerNetworkObject.IsOwner)
+            {
+                return;
+            }
             Rigidbody2D targetPlayerRigidbody = targetPlayerNetworkObject.gameObject.GetComponentInParent<Rigidbody2D>();
             Debug.Log("Force applied to target: " + knockbackForceAppliedToTarget);
             targetPlayerRigidbody.AddForce(knockbackForceAppliedToTarget, ForceMode2D.Impulse);

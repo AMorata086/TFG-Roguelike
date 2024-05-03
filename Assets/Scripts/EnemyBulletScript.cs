@@ -32,7 +32,9 @@ public class EnemyBulletScript : NetworkBehaviour
                 break;
             case "Player_Hitbox":
                 collision.gameObject.GetComponentInParent<PlayerController>().GetHurt(Damage);
-                collision.gameObject.GetComponentInParent<Rigidbody2D>().AddForce(forceOfImpact * Time.fixedDeltaTime * gameObject.GetComponent<Rigidbody2D>().velocity.normalized, ForceMode2D.Impulse);
+                NetworkObject playerHitNetworkObject = collision.gameObject.GetComponentInParent<NetworkObject>();
+                Vector2 knockbackForceApplied = gameObject.GetComponent<Rigidbody2D>().velocity.normalized * forceOfImpact * Time.fixedDeltaTime;
+                AddKnockbackForceClientRpc(playerHitNetworkObject, knockbackForceApplied);
                 InstantiateParticleEffectsClientRpc();
                 Destroy(gameObject);
                 break;
@@ -46,6 +48,25 @@ public class EnemyBulletScript : NetworkBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    [ClientRpc]
+    private void AddKnockbackForceClientRpc(NetworkObjectReference playerHitNetworkObjectReference, Vector2 knockbackForceAppliedToTarget)
+    {
+        if (playerHitNetworkObjectReference.TryGet(out NetworkObject targetPlayerNetworkObject))
+        {
+            if (!targetPlayerNetworkObject.IsOwner)
+            {
+                return;
+            }
+            Rigidbody2D targetPlayerRigidbody = targetPlayerNetworkObject.gameObject.GetComponentInParent<Rigidbody2D>();
+            Debug.Log("Force applied to target: " + knockbackForceAppliedToTarget);
+            targetPlayerRigidbody.AddForce(knockbackForceAppliedToTarget, ForceMode2D.Impulse);
+        }
+        else
+        {
+            Debug.Log("Error: Couldn't find target player Network Object");
         }
     }
 
