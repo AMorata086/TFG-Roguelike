@@ -1,16 +1,20 @@
+using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class PlayerController : NetworkBehaviour
 {
     // Player Stats
     [Header("Player Stats")]
+    public string PlayerName;
     public float MovementSpeed = 3000f;
     public int MaxHealthPoints = 10;
     private int CurrentHealthPoints = 10;
     public int Damage = 2;
-    private bool canMove = false;
+    public NetworkVariable<bool> CanMove = new NetworkVariable<bool>(false);
     [SerializeField] private float dodgeStrength = 750f;
     private float invulnerabilityTime = 0.25f;
     private float lastTimeGotHurt = 0f;
@@ -49,17 +53,47 @@ public class PlayerController : NetworkBehaviour
 
     [SerializeField] private InGameUIScript interfaceScript;
     [SerializeField] private SoundEffectManager soundEffectManager;
+    [SerializeField] private GameObject pauseMenu;
 
     [SerializeField] private PlayerSpritesReferences playerSpritesReferences;
 
+    [SerializeField] private List<Vector3> spawnPoints;
+
+    private void SetPlayerReady(InputAction.CallbackContext context)
+    {
+        SynchronizeCanMoveServerRpc();
+        playerControls.Player.Dodge.performed -= SetPlayerReady;
+        playerControls.Player.Dodge.performed += Dodge;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SynchronizeCanMoveServerRpc()
+    {
+        CanMove.Value = true;
+    }
+
     private void Dodge(InputAction.CallbackContext context)
     {
-        if ((Time.time - lastDodgeTime) < dodgeCooldown)
+        if ((Time.time - lastDodgeTime) < dodgeCooldown || !CanMove.Value || !IsOwner)
         {
             return;
         }
         Rb.AddForce(Rb.velocity.normalized * dodgeStrength * Time.fixedDeltaTime, ForceMode2D.Impulse);
         lastDodgeTime = Time.time;
+    }
+
+    private void TogglePauseMenu(InputAction.CallbackContext context)
+    {
+        PauseMenu pauseMenuScript = pauseMenu.GetComponent<PauseMenu>();
+        if(pauseMenuScript.IsPaused)
+        {
+            pauseMenuScript.ResumeGame();
+        }
+        else
+        {
+            pauseMenuScript.OpenPauseMenu();
+        }
+        
     }
 
     private void Shoot()
@@ -115,9 +149,9 @@ public class PlayerController : NetworkBehaviour
     private void GetHurtClientRpc(int damageReceived)
     {
         CurrentHealthPoints -= damageReceived;
-        //interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
         damageVFX.CallDamageEffect();
         Debug.Log(gameObject.tag + " current HP = " + CurrentHealthPoints);
+        CallUpdateHealthBar();
     }
 
     public void Heal(int healthRestored)
@@ -136,8 +170,7 @@ public class PlayerController : NetworkBehaviour
             healthPointsAfterHealing = CurrentHealthPoints + healthRestored - mod;
         }
         HealClientRpc(healthPointsAfterHealing);
-
-        //interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+        CallUpdateHealthBar();
     }
 
     [ClientRpc]
@@ -191,14 +224,6 @@ public class PlayerController : NetworkBehaviour
         PlayerCamera.transform.position = cameraTargetPosition;
     }
 
-    private void Awake()
-    {
-        playerControls = new InputActions();
-        // Subscribe to the actions that are button type
-        // playerControls.Player.Attack.performed += Shoot;
-        playerControls.Player.Dodge.performed += Dodge;
-    }
-
     private void OnEnable()
     {
         //playerControls.Player.Enable();
@@ -228,25 +253,74 @@ public class PlayerController : NetworkBehaviour
 
         if (IsOwner)
         {
+            playerControls = new InputActions();
+            transform.position = spawnPoints[(int)OwnerClientId];
+            
             PlayerCamera.transform.gameObject.SetActive(true);
+            
+            playerControls.Player.Dodge.performed += SetPlayerReady;
+            playerControls.Player.Pause.performed += TogglePauseMenu;
             playerControls.Player.Enable();
+
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         }
+
         base.OnNetworkSpawn();
+    }
+
+    private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
+    {
+        if (IsServer)
+        {
+            CanMove.Value = false;
+        }
     }
 
     // Start is called before the first frame update
     void Start()
     {
         damageVFX = GetComponent<DamageEffect>();
+        pauseMenu = GameObject.Find("PauseMenuOverlay");
         soundEffectManager = GameObject.Find("SoundManager").GetComponent<SoundEffectManager>();
-        if(!IsOwner)
+        interfaceScript = GameObject.Find("User Interface").GetComponent<InGameUIScript>();
+        if (!IsOwner)
         {
             return;
         }
-        interfaceScript = GameObject.Find("User Interface").GetComponent<InGameUIScript>();
         CurrentHealthPoints = MaxHealthPoints;
-        interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
-        
+        CallInitializeUserInterfaceServerRpc();
+        CallUpdateHealthBar();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void CallInitializeUserInterfaceServerRpc()
+    {
+        CallInitializeUserInterfaceClientRpc();
+    }
+
+    [ClientRpc]
+    private void CallInitializeUserInterfaceClientRpc()
+    {
+        Debug.Log("Calling Client RPC for UI initialization...");
+        interfaceScript.InitializeUserInterface();
+    }
+
+    private void CallUpdateHealthBar()
+    {
+        CallUpdateHealthBarClientRpc();
+    }
+
+    [ClientRpc]
+    private void CallUpdateHealthBarClientRpc()
+    {
+        if(IsOwner)
+        {
+            interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+        } 
+        else
+        {
+            interfaceScript.updateOtherPlayerHealthBar(CurrentHealthPoints, MaxHealthPoints);
+        }
     }
 
     // Update is called once per frame
@@ -256,12 +330,12 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        /*
-        if (!canMove)
+
+        if (!CanMove.Value)
         {
             return;
         }
-        */
+        
         mousePosition = PlayerCamera.ScreenToWorldPoint(playerControls.Player.MousePosition.ReadValue<Vector2>());
         AnimatePlayer();
         DisplaceCamera();
@@ -276,12 +350,12 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        /*
-        if (!canMove)
+        
+        if (!CanMove.Value)
         {
             return;
         }
-        */
+        
         movementDirection = playerControls.Player.Move.ReadValue<Vector2>().normalized;
         // rb.velocity = movementDirection * movementSpeed * Time.deltaTime;
         Vector2 force = movementDirection * MovementSpeed * Time.deltaTime;

@@ -27,17 +27,23 @@ public class EnemyMeleeController : NetworkBehaviour
     Transform target;
     [SerializeField] private float NextWaypointDistance = 1f;
     Path path;
-    int currentWaypoint = 0;
-    bool reachedEndOfPath = false;
+    private int currentWaypoint = 0;
+    private bool reachedEndOfPath = false;
     Seeker seeker;
 
-    Vector2 direction;
-    float distanceToTarget;
-    bool isChasingTarget = false;
+    private Vector2 direction;
+    private float distanceToTarget;
+    private bool isChasingTarget = false;
+    private bool isSpawning = true;
     public float TargetDetectionDistance = 10f;
 
     public void GetHurt(int damageReceived)
     {
+        if(isSpawning)
+        {
+            return;
+        }
+
         HealthPoints -= damageReceived;
         InstantiateDamageVfxClientRpc();
     }
@@ -50,6 +56,7 @@ public class EnemyMeleeController : NetworkBehaviour
 
     private IEnumerator PerformSpawn()
     {
+        isSpawning = true;
         spawnEffect.CallSpawnEffect();
         yield return new WaitForSeconds(1);
         if(IsServer)
@@ -57,6 +64,7 @@ public class EnemyMeleeController : NetworkBehaviour
             InvokeRepeating(nameof(UpdatePath), 0f, 0.1f);
 
         }
+        isSpawning = false;
         yield return null;
     }
 
@@ -79,6 +87,10 @@ public class EnemyMeleeController : NetworkBehaviour
 
     private void AttackTarget(Collider2D collision)
     {
+        if (isSpawning)
+        {
+            return;
+        }
         // invoke the GetHurt method from the player's controller
         collision.gameObject.GetComponentInParent<PlayerController>().GetHurt(damage);
         // Apply a knockback to the player when in contact with the enemy

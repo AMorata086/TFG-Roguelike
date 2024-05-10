@@ -26,7 +26,6 @@ public class PlayerBulletScript : NetworkBehaviour
     private void ChangeSpriteRendererClientRpc(string bulletOwnerTag)
     {
         gameObject.tag = bulletOwnerTag;
-        Debug.Log("Tag of the bullet fired --> " + gameObject.tag);
         switch (gameObject.tag)
         {
             case "Player_1_Bullet":

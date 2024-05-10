@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -6,12 +7,15 @@ using UnityEngine;
 
 public class GameManager : NetworkBehaviour
 {
+    public event EventHandler OnStateChanged;
+
     // Define a simple state machine to control the current state
     private enum State
     {
-        Idle,
-        InBattle,
-        ReachedGoal
+        SelectingGamemode,
+        WaitingToStart,
+        InGame,
+        GameFinished
     }
 
     private struct Wave
@@ -28,12 +32,12 @@ public class GameManager : NetworkBehaviour
 
     [Space]
     [Header("Objects of this script")]
-    private State currentState;
+    private NetworkVariable<State> currentState = new NetworkVariable<State>(State.SelectingGamemode);
     private int currentEnemies = 0;
     [Space]
     [Header("Reference to the players")]
-    [SerializeField] private GameObject player1;
-    [SerializeField] private GameObject player2;
+    private PlayerController hostPlayerController;
+    private PlayerController clientPlayerController;
     [Space]
     [Header("References to prefabs")]
     [SerializeField] private GameObject enemyMelee;
@@ -41,6 +45,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject enemyFlying;
     [Space]
     [Header("References to other objects")]
+    [SerializeField] private GameObject waitingToStartOverlay;
     [SerializeField] private DoorManager doorManager;
     [SerializeField] private RoomManager[] rooms;
     private Wave[][] wavesInRoom;
@@ -64,7 +69,7 @@ public class GameManager : NetworkBehaviour
                 int[] enemiesInWave = new int[maxNumberOfEnemies];
                 for (int k = 0; k < enemiesInWave.Length; k++)
                 {
-                    enemiesInWave[k] = Random.Range(1, rooms[i].enemiesAllowed + 1);
+                    enemiesInWave[k] = UnityEngine.Random.Range(1, rooms[i].enemiesAllowed + 1);
                 }
                 wavesInRoom[i][j] = new Wave(enemiesInWave);
             }
@@ -85,7 +90,6 @@ public class GameManager : NetworkBehaviour
     // when called spawn the waves of enemies of that room in an order
     public IEnumerator SpawnEnemies(int roomNumber)
     {
-        currentState = State.InBattle;
         // close the doors when the player enters the room
         SwitchDoorsStateClientRpc();
         
@@ -124,7 +128,6 @@ public class GameManager : NetworkBehaviour
 
         // open the doors when all enemies have been killed
         SwitchDoorsStateClientRpc();
-        currentState = State.Idle;
 
         yield return null;
     }
@@ -133,12 +136,6 @@ public class GameManager : NetworkBehaviour
     private void SwitchDoorsStateClientRpc()
     {
         doorManager.SwitchDoorState();
-    }
-    
-
-    private void Awake()
-    {
-        currentState = State.Idle;
     }
 
     public override void OnNetworkSpawn()
@@ -149,7 +146,11 @@ public class GameManager : NetworkBehaviour
         {
             return;
         }
+
+        currentState.OnValueChanged += State_OnValueChanged;
+
         InitializeRooms();
+
         for(int i = 0; i < healthPacks.Length; i++)
         {
             healthPacks[i] = Instantiate(healthPackPrefab);
@@ -157,5 +158,62 @@ public class GameManager : NetworkBehaviour
             NetworkObject healthPackNetworkObject = healthPacks[i].GetComponent<NetworkObject>();
             healthPackNetworkObject.Spawn(true);
         }
+    }
+
+    private void State_OnValueChanged(State previousValue, State newValue)
+    {
+        OnStateChanged?.Invoke(this, EventArgs.Empty);
+        Debug.Log(previousValue + " --> " + newValue);
+    }
+
+    private void Update()
+    {
+        if(!IsServer)
+        {
+            return;
+        }
+
+        switch(currentState.Value)
+        {
+            case State.SelectingGamemode:
+                // things that should execute before starting the game
+                currentState.Value = State.WaitingToStart;
+                break;
+            case State.WaitingToStart:
+                // things that should execute before starting the game
+                SetWaitingToStartOverlayActiveStateClientRpc(true);
+                hostPlayerController = GameObject.FindGameObjectWithTag("Player_1").GetComponent<PlayerController>();
+                GameObject clientPlayerGameObject = GameObject.FindGameObjectWithTag("Player_2");
+                if (clientPlayerGameObject == null)
+                {
+                    if(hostPlayerController.CanMove.Value)
+                    {
+                        currentState.Value = State.InGame;
+                    }
+                }
+                else
+                {
+                    clientPlayerController = clientPlayerGameObject.GetComponent<PlayerController>();
+                    Debug.Log("host can move: " + hostPlayerController.CanMove + ", client can move: " + clientPlayerController.CanMove);
+                    if (hostPlayerController.CanMove.Value && clientPlayerController.CanMove.Value)
+                    {
+                        currentState.Value = State.InGame;
+                    }
+                }
+                break;
+            case State.InGame:
+                SetWaitingToStartOverlayActiveStateClientRpc(false);
+                // things that should execute while playing
+                break;
+            case State.GameFinished:
+                // things that should execute upun Game Over
+                break;
+        }
+    }
+
+    [ClientRpc]
+    private void SetWaitingToStartOverlayActiveStateClientRpc(bool isActive)
+    {
+        waitingToStartOverlay.SetActive(isActive);
     }
 }

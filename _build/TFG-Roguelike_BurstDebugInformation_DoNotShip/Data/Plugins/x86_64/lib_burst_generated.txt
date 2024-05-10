@@ -84,7 +84,6 @@ Library: D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x
 --linker-options=PdbAltPath="TFG-Roguelike_Data/Plugins/x86_64/lib_burst_generated.pdb"
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\Burst
---debug=LineOnly
 --key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
 --decode-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Library\Burst
 --output=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst_generated
@@ -95,7 +94,7 @@ Library: D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x
 --method=Unity.Jobs.IJobForExtensions+ForJobStruct`1[[UnityEngine.Rendering.Universal.TilingJob, Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(UnityEngine.Rendering.Universal.TilingJob&, Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--a6f5259e22ed809ef3937424c4bd686d
 --platform=Windows
 --backend=burst-llvm-15
---target=X64_SSE2
+--target=AVX2
 --global-safety-checks-setting=Off
 --meta-data-generation=False
 --dump=Function
@@ -176,7 +175,6 @@ Library: D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x
 --linker-options=PdbAltPath="TFG-Roguelike_Data/Plugins/x86_64/lib_burst_generated.pdb"
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\Burst
---debug=LineOnly
 --key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
 --decode-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Library\Burst
 --output=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst_generated
@@ -281,7 +279,7 @@ Library: D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x
 --method=Unity.Networking.Transport.FragmentationPipelineStage, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Send(Unity.Networking.Transport.NetworkPipelineContext&, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Networking.Transport.InboundSendBuffer&, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Networking.Transport.NetworkPipelineStage+Requests&, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--3134d6572ef8ceff1d5057c9272f12fe
 --platform=Windows
 --backend=burst-llvm-15
---target=AVX2
+--target=X64_SSE2
 --global-safety-checks-setting=Off
 --meta-data-generation=False
 --dump=Function
@@ -362,7 +360,6 @@ Library: D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x
 --linker-options=PdbAltPath="TFG-Roguelike_Data/Plugins/x86_64/lib_burst_generated.pdb"
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\Burst
---debug=LineOnly
 --key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
 --decode-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Library\Burst
 --output=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst_generated
@@ -550,7 +547,6 @@ Library: D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x
 --linker-options=PdbAltPath="TFG-Roguelike_Data/Plugins/x86_64/lib_burst_generated.pdb"
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\Burst
---debug=LineOnly
 --key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
 --decode-folder=D:\almoh\Documents\GitHub\TFG-Roguelike\Library\Burst
 --output=D:\almoh\Documents\GitHub\TFG-Roguelike\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst_generated
