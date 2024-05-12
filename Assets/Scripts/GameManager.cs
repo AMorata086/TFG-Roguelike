@@ -7,10 +7,12 @@ using UnityEngine;
 
 public class GameManager : NetworkBehaviour
 {
+    public static GameManager Instance { get; private set; }
+
     public event EventHandler OnStateChanged;
 
     // Define a simple state machine to control the current state
-    private enum State
+    public enum State
     {
         SelectingGamemode,
         WaitingToStart,
@@ -32,7 +34,8 @@ public class GameManager : NetworkBehaviour
 
     [Space]
     [Header("Objects of this script")]
-    private NetworkVariable<State> currentState = new NetworkVariable<State>(State.SelectingGamemode);
+    public NetworkVariable<State> currentState = new NetworkVariable<State>(State.SelectingGamemode);
+    private bool haveAllPlayersSpawned = false;
     private int currentEnemies = 0;
     [Space]
     [Header("Reference to the players")]
@@ -40,9 +43,10 @@ public class GameManager : NetworkBehaviour
     private PlayerController clientPlayerController;
     [Space]
     [Header("References to prefabs")]
-    [SerializeField] private GameObject enemyMelee;
-    [SerializeField] private GameObject enemyRanged;
-    [SerializeField] private GameObject enemyFlying;
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject enemyMeleePrefab;
+    [SerializeField] private GameObject enemyRangedPrefab;
+    [SerializeField] private GameObject enemyFlyingPrefab;
     [Space]
     [Header("References to other objects")]
     [SerializeField] private GameObject waitingToStartOverlay;
@@ -52,6 +56,11 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject healthPackPrefab;
     private GameObject[] healthPacks = new GameObject[2];
     [SerializeField] private Vector3[] healthPackPositions = new Vector3[2];
+
+    public bool IsWaitingToStart()
+    {
+        return currentState.Value == State.WaitingToStart;
+    }
 
     private void InitializeRooms()
     {
@@ -102,17 +111,17 @@ public class GameManager : NetworkBehaviour
                 switch (wavesInRoom[roomNumber][i].enemiesInWave[j])
                 {
                     case 1:
-                        GameObject enemyMeleeSpawned = Instantiate(enemyMelee, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        GameObject enemyMeleeSpawned = Instantiate(enemyMeleePrefab, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
                         NetworkObject enemyMeleeSpawnedNetworkObject = enemyMeleeSpawned.GetComponent<NetworkObject>();
                         enemyMeleeSpawnedNetworkObject.Spawn(true);
                         break;
                     case 2:
-                        GameObject enemyRangedSpawned = Instantiate(enemyRanged, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        GameObject enemyRangedSpawned = Instantiate(enemyRangedPrefab, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
                         NetworkObject enemyRangedSpawnedNetworkObject = enemyRangedSpawned.GetComponent<NetworkObject>();
                         enemyRangedSpawnedNetworkObject.Spawn(true);
                         break;
                     case 3:
-                        GameObject enemyFlyingSpawned = Instantiate(enemyFlying, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
+                        GameObject enemyFlyingSpawned = Instantiate(enemyFlyingPrefab, (Vector3)rooms[roomNumber].spawnPoints[j], Quaternion.identity);
                         NetworkObject enemyFlyingSpawnedNetworkObject = enemyFlyingSpawned.GetComponent<NetworkObject>();
                         enemyFlyingSpawnedNetworkObject.Spawn(true);
                         break;
@@ -148,22 +157,46 @@ public class GameManager : NetworkBehaviour
         }
 
         currentState.OnValueChanged += State_OnValueChanged;
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
 
         InitializeRooms();
+    }
 
-        for(int i = 0; i < healthPacks.Length; i++)
+    private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            healthPacks[i] = Instantiate(healthPackPrefab);
-            healthPacks[i].transform.position = healthPackPositions[i];
-            NetworkObject healthPackNetworkObject = healthPacks[i].GetComponent<NetworkObject>();
-            healthPackNetworkObject.Spawn(true);
+            GameObject playerGameObject = Instantiate(playerPrefab);
+            playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, false); // we don't want to destroy on load since there might be other levels
         }
+
+        haveAllPlayersSpawned = true;
     }
 
     private void State_OnValueChanged(State previousValue, State newValue)
     {
         OnStateChanged?.Invoke(this, EventArgs.Empty);
         Debug.Log(previousValue + " --> " + newValue);
+    }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        if(IsServer)
+        {
+            for (int i = 0; i < healthPacks.Length; i++)
+            {
+                healthPacks[i] = Instantiate(healthPackPrefab);
+                healthPacks[i].transform.position = healthPackPositions[i];
+                NetworkObject healthPackNetworkObject = healthPacks[i].GetComponent<NetworkObject>();
+                healthPackNetworkObject.Spawn(true);
+            }
+        }
+        
     }
 
     private void Update()
@@ -176,8 +209,10 @@ public class GameManager : NetworkBehaviour
         switch(currentState.Value)
         {
             case State.SelectingGamemode:
-                // things that should execute before starting the game
-                currentState.Value = State.WaitingToStart;
+                if (haveAllPlayersSpawned)
+                {
+                    currentState.Value = State.WaitingToStart;
+                }
                 break;
             case State.WaitingToStart:
                 // things that should execute before starting the game
@@ -194,7 +229,6 @@ public class GameManager : NetworkBehaviour
                 else
                 {
                     clientPlayerController = clientPlayerGameObject.GetComponent<PlayerController>();
-                    Debug.Log("host can move: " + hostPlayerController.CanMove + ", client can move: " + clientPlayerController.CanMove);
                     if (hostPlayerController.CanMove.Value && clientPlayerController.CanMove.Value)
                     {
                         currentState.Value = State.InGame;

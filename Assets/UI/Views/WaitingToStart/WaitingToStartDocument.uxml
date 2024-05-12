@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/Views/WaitingToStart/WaitingToStartUSS.uss?fileID=7433441132597879392&amp;guid=34dcba43011f87e43bb805d80201646e&amp;type=3#WaitingToStartUSS" />
-    <ui:VisualElement name="MainContainer" class="MainContainer">
-        <ui:Label tabindex="-1" text="Waiting to start..." parse-escape-sequences="true" display-tooltip-when-elided="true" class="Label" style="flex-grow: 0;" />
-        <ui:Label tabindex="-1" text="Press &lt;Spacebar&gt; or &lt;Right Click&gt; when ready" parse-escape-sequences="true" display-tooltip-when-elided="true" class="Label" style="flex-grow: 0;" />
-    </ui:VisualElement>
-</ui:UXML>

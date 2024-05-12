@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Views/Lobby/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=ed3fe9ee9cf4c98419deeccec670ce2b&amp;type=3#LobbyStyle" />
+    <ui:VisualElement name="MainContainer" class="MainContainer">
+        <ui:VisualElement name="ButtonsContainer" class="ButtonsContainer">
+            <ui:Button text="CREATE GAME" parse-escape-sequences="true" display-tooltip-when-elided="true" name="CreateGameButton" class="LobbyButton" />
+            <ui:TextField picking-mode="Ignore" label="Enter Lobby code:" value="CODE" name="LobbyJoinCode" max-length="10" class="TextField" />
+            <ui:Button text="JOIN GAME" parse-escape-sequences="true" display-tooltip-when-elided="true" name="JoinGameButton" class="LobbyButton" style="margin-top: 1%;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

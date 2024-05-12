@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Components/ConnectionDeniedOverlay/ConnectingOverlayStyle.uss?fileID=7433441132597879392&amp;guid=a0b3ecc6340153642944322457589147&amp;type=3#ConnectingOverlayStyle" />
+    <ui:VisualElement name="MainContainer" class="MainContainer">
+        <ui:Label tabindex="-1" text="Connecting..." parse-escape-sequences="true" display-tooltip-when-elided="true" name="ResponseLabel" class="ResponseLabel" />
+        <ui:Button text="QUIT TO MENU" parse-escape-sequences="true" display-tooltip-when-elided="true" name="QuitToMenuButton" class="Button" />
+    </ui:VisualElement>
+</ui:UXML>

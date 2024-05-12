@@ -167,7 +167,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &2657177327284125326
 MonoBehaviour:
@@ -185,7 +185,8 @@ MonoBehaviour:
   MovementSpeed: 3000
   MaxHealthPoints: 10
   Damage: 2
-  CanMove: 0
+  CanMove:
+    m_InternalValue: 0
   dodgeStrength: 750
   Rb: {fileID: 7476635088602437103}
   Hand: {fileID: 2493990819836048051}
@@ -201,6 +202,7 @@ MonoBehaviour:
   shootingCooldown: 0.5
   interfaceScript: {fileID: 0}
   soundEffectManager: {fileID: 0}
+  pauseMenu: {fileID: 0}
   playerSpritesReferences: {fileID: 11400000, guid: 31491b2c950d44743a9706f3614eb042, type: 2}
   spawnPoints:
   - {x: -1, y: 0, z: 0}
@@ -566,9 +568,9 @@ MonoBehaviour:
   SyncRotAngleX: 0
   SyncRotAngleY: 0
   SyncRotAngleZ: 1
-  SyncScaleX: 0
+  SyncScaleX: 1
   SyncScaleY: 1
-  SyncScaleZ: 0
+  SyncScaleZ: 1
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01

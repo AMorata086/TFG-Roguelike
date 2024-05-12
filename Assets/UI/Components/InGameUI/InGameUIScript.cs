@@ -50,7 +50,8 @@ public class InGameUIScript : MonoBehaviour
             Debug.Log("Player_2 Not Found: initializing interface in single player mode");
             otherPlayerInfo.style.display = DisplayStyle.None;
             playerPortrait.style.backgroundImage = Background.FromSprite(playerSpritesReferences.Player1Sprite);
-            playerName.text = localPlayerGameObject.GetComponent<PlayerController>().PlayerName;
+            playerName.text = MultiplayerBehavior.Instance.GetPlayerName();
+            //playerName.text = localPlayerGameObject.GetComponent<PlayerController>().PlayerName;
         } else
         {
             Debug.Log("Player_2 Found: inizializing interface in multiplayer mode");
@@ -66,8 +67,9 @@ public class InGameUIScript : MonoBehaviour
             {
                 // set the UI part of the local player - Player_1
                 playerPortrait.style.backgroundImage = Background.FromSprite(playerSpritesReferences.Player1Sprite);
-                playerName.text = localPlayerGameObject.GetComponent<PlayerController>().PlayerName;
-                
+                playerName.text = MultiplayerBehavior.Instance.GetPlayerName();
+                //playerName.text = localPlayerGameObject.GetComponent<PlayerController>().PlayerName;
+
                 // set the UI part of the remote player - Player_2
                 otherPlayerPortrait.style.backgroundImage = Background.FromSprite(playerSpritesReferences.Player2Sprite);
             }
@@ -79,7 +81,8 @@ public class InGameUIScript : MonoBehaviour
 
                 // set the UI part of the local player - Player_2
                 playerPortrait.style.backgroundImage = Background.FromSprite(playerSpritesReferences.Player2Sprite);
-                playerName.text = localPlayerGameObject.GetComponent<PlayerController>().PlayerName;
+                playerName.text = MultiplayerBehavior.Instance.GetPlayerName();
+                //playerName.text = localPlayerGameObject.GetComponent<PlayerController>().PlayerName;
 
                 // set the UI part of the remote player - Player_1
                 otherPlayerPortrait.style.backgroundImage = Background.FromSprite(playerSpritesReferences.Player1Sprite);

@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Views/PlayerSelection/PlayerSelectionStyle.uss?fileID=7433441132597879392&amp;guid=96be2dee44036724da866856ad714068&amp;type=3#PlayerSelectionStyle" />
+    <ui:VisualElement name="MainContainer" class="MainContainer">
+        <ui:VisualElement name="ContentsContainer" class="ContentsContainer">
+            <ui:VisualElement name="MenuButtonContainer" class="Container-1">
+                <ui:Button text="&lt; Back to menu" parse-escape-sequences="true" display-tooltip-when-elided="true" name="MainMenuButton" class="Button" style="opacity: 1;" />
+                <ui:TextField picking-mode="Ignore" label="LOBBY CODE:" value="CODE" name="LobbyCode" max-length="10" is-delayed="false" readonly="true" class="LobbyCodeTextField" />
+            </ui:VisualElement>
+            <ui:VisualElement name="PlayerNameContainer" class="Container-2">
+                <ui:Label tabindex="-1" text="ENTER A NAME" parse-escape-sequences="true" display-tooltip-when-elided="true" class="Label" />
+                <ui:TextField value="Player" password="false" usage-hints="None" tooltip="Enter a name" max-length="20" name="NameInputField" class="NameTextField" />
+            </ui:VisualElement>
+            <ui:VisualElement name="ReadyButtonContainer" class="Container-3">
+                <ui:Button text="READY" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ReadyButton" class="Button" style="width: 25%; height: 20%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

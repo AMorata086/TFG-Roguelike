@@ -27,14 +27,14 @@ public class MultiplayerMenuScript : MonoBehaviour
 
     private void StartHostSession(ClickEvent clickEvent)
     {
-        NetworkManager.Singleton.StartHost();
+        MultiplayerBehavior.Instance.StartHost();
         mainContainer.style.display = DisplayStyle.Flex;
         multiplayerButtonsContainer.style.display = DisplayStyle.None;
     }
 
     private void StartClientSession(ClickEvent clickEvent)
     {
-        NetworkManager.Singleton.StartClient();
+        MultiplayerBehavior.Instance.StartClient();
         mainContainer.style.display = DisplayStyle.Flex;
         multiplayerButtonsContainer.style.display = DisplayStyle.None;
     }

@@ -10,10 +10,10 @@ public class PlayerController : NetworkBehaviour
     // Player Stats
     [Header("Player Stats")]
     public string PlayerName;
-    public float MovementSpeed = 3000f;
-    public int MaxHealthPoints = 10;
-    private int CurrentHealthPoints = 10;
-    public int Damage = 2;
+    [SerializeField] private float movementSpeed = 3000f;
+    [SerializeField] private int maxHealthPoints = 10;
+    private int currentHealthPoints = 10;
+    [SerializeField] private int damage = 2;
     public NetworkVariable<bool> CanMove = new NetworkVariable<bool>(false);
     [SerializeField] private float dodgeStrength = 750f;
     private float invulnerabilityTime = 0.25f;
@@ -41,9 +41,9 @@ public class PlayerController : NetworkBehaviour
     private Vector3 cameraTargetPosition = new Vector3();
     public float cameraThreshold;
 
-    public Animator animator;
+    [SerializeField] private Animator animator;
 
-    public InputActions playerControls;
+    private InputActions playerControls;
 
     // Cooldown controls
     [SerializeField] private float dodgeCooldown = 2f;
@@ -117,7 +117,7 @@ public class PlayerController : NetworkBehaviour
         NetworkObject bulletNetworkObject = bullet.GetComponent<NetworkObject>();
         bulletNetworkObject.Spawn(true);
         PlayerBulletScript bulletGameObjectPlayerBulletScript = bullet.GetComponent<PlayerBulletScript>();
-        bulletGameObjectPlayerBulletScript.Damage = Damage;
+        bulletGameObjectPlayerBulletScript.Damage = damage;
         bulletGameObjectPlayerBulletScript.ChangeBulletSpriteAndMaterial(bulletTag);
         bullet.GetComponent<Rigidbody2D>().AddForce(ShootingPoint.transform.right * BulletSpeed * Time.deltaTime, ForceMode2D.Impulse);
     }
@@ -148,26 +148,26 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void GetHurtClientRpc(int damageReceived)
     {
-        CurrentHealthPoints -= damageReceived;
+        currentHealthPoints -= damageReceived;
         damageVFX.CallDamageEffect();
-        Debug.Log(gameObject.tag + " current HP = " + CurrentHealthPoints);
+        Debug.Log(gameObject.tag + " current HP = " + currentHealthPoints);
         CallUpdateHealthBar();
     }
 
     public void Heal(int healthRestored)
     {
         int healthPointsAfterHealing = 0;
-        Debug.Log("Before healing: " + CurrentHealthPoints);
+        Debug.Log("Before healing: " + currentHealthPoints);
         // Control the health points not overflowing the Max Health value
-        if ((((CurrentHealthPoints + healthRestored) % MaxHealthPoints) == (CurrentHealthPoints + healthRestored)) ||
-            (((CurrentHealthPoints + healthRestored) % MaxHealthPoints) == 0))
+        if ((((currentHealthPoints + healthRestored) % maxHealthPoints) == (currentHealthPoints + healthRestored)) ||
+            (((currentHealthPoints + healthRestored) % maxHealthPoints) == 0))
         {
-            healthPointsAfterHealing = CurrentHealthPoints + healthRestored;
+            healthPointsAfterHealing = currentHealthPoints + healthRestored;
         } 
         else
         {
-            int mod = (CurrentHealthPoints + healthRestored) % MaxHealthPoints;
-            healthPointsAfterHealing = CurrentHealthPoints + healthRestored - mod;
+            int mod = (currentHealthPoints + healthRestored) % maxHealthPoints;
+            healthPointsAfterHealing = currentHealthPoints + healthRestored - mod;
         }
         HealClientRpc(healthPointsAfterHealing);
         CallUpdateHealthBar();
@@ -176,13 +176,13 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void HealClientRpc(int healthPointsAfterHealing)
     {
-        CurrentHealthPoints = healthPointsAfterHealing;
-        Debug.Log("After healing: " + CurrentHealthPoints);
+        currentHealthPoints = healthPointsAfterHealing;
+        Debug.Log("After healing: " + currentHealthPoints);
     }
 
     private void PerformDeath()
     {
-        if (CurrentHealthPoints <= 0)
+        if (currentHealthPoints <= 0)
         {
             ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
             Destroy(gameObject);
@@ -231,6 +231,11 @@ public class PlayerController : NetworkBehaviour
 
     private void OnDisable()
     {
+        if(!IsOwner)
+        {
+            return;
+        }
+
         playerControls.Player.Disable();
     }
 
@@ -262,7 +267,7 @@ public class PlayerController : NetworkBehaviour
             playerControls.Player.Pause.performed += TogglePauseMenu;
             playerControls.Player.Enable();
 
-            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+            // NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         }
 
         base.OnNetworkSpawn();
@@ -287,7 +292,7 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        CurrentHealthPoints = MaxHealthPoints;
+        currentHealthPoints = maxHealthPoints;
         CallInitializeUserInterfaceServerRpc();
         CallUpdateHealthBar();
     }
@@ -315,11 +320,11 @@ public class PlayerController : NetworkBehaviour
     {
         if(IsOwner)
         {
-            interfaceScript.updateHealthBar(CurrentHealthPoints, MaxHealthPoints);
+            interfaceScript.updateHealthBar(currentHealthPoints, maxHealthPoints);
         } 
         else
         {
-            interfaceScript.updateOtherPlayerHealthBar(CurrentHealthPoints, MaxHealthPoints);
+            interfaceScript.updateOtherPlayerHealthBar(currentHealthPoints, maxHealthPoints);
         }
     }
 
@@ -358,7 +363,7 @@ public class PlayerController : NetworkBehaviour
         
         movementDirection = playerControls.Player.Move.ReadValue<Vector2>().normalized;
         // rb.velocity = movementDirection * movementSpeed * Time.deltaTime;
-        Vector2 force = movementDirection * MovementSpeed * Time.deltaTime;
+        Vector2 force = movementDirection * movementSpeed * Time.deltaTime;
         Rb.AddForce(force);
         // Debug.Log(rb.velocity);
 

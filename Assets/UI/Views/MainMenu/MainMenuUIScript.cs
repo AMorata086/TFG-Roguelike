@@ -25,12 +25,12 @@ public class MainMenuUIScript : MonoBehaviour
 
     private void PlayOffline(ClickEvent clickEvent)
     {
-        Loader.LoadScene(Loader.Scene.OfflineLevel1);
+        //Loader.LoadScene(Loader.Scene.Level1Scene);
     }
 
     private void PlayOnline(ClickEvent clickEvent)
     {
-
+        Loader.LoadScene(Loader.Scene.LobbyScene);
     }
 
     private void QuitGame(ClickEvent clickEvent)
