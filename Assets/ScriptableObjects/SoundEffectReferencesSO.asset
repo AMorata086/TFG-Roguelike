@@ -15,6 +15,9 @@ MonoBehaviour:
   PlayerShot: {fileID: 8300000, guid: 89b2aa810519d3143ba17705d9b844d4, type: 3}
   EnemyRangedShot: {fileID: 8300000, guid: 0a1ab9912d47bd44eb6c382f1f4befce, type: 3}
   EnemyDroneShot: {fileID: 8300000, guid: 63c8a43fd2a97ae4ba34a6a3920d4d0f, type: 3}
-  PlayerHurt: {fileID: 0}
-  EnemyHurt: {fileID: 0}
-  EnemyDies: {fileID: 0}
+  PlayerHurt: {fileID: 8300000, guid: a3cf6937a978c9f4fa3ea07bcbacd4b0, type: 3}
+  EnemyHurt: {fileID: 8300000, guid: 206157cd0fe42d3439b9c2d7ccc12c8b, type: 3}
+  EnemyDies: {fileID: 8300000, guid: 2716e267f15bf9f4ea2412d9656f9daa, type: 3}
+  BulletRicochet: {fileID: 8300000, guid: dba220cbe584ecf49a6c17b1942d6c8e, type: 3}
+  DoorsOpening: {fileID: 8300000, guid: 8c088ef8530a69c45afb42af746396bc, type: 3}
+  DoorsClosing: {fileID: 8300000, guid: 708a592272f13554f92e3e4550ec7595, type: 3}

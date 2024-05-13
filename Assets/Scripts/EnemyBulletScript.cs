@@ -28,6 +28,7 @@ public class EnemyBulletScript : NetworkBehaviour
         {
             case "Environment":
                 InstantiateParticleEffectsClientRpc();
+                InstantiateRicochetSfxClientRpc();
                 Destroy(gameObject);
                 break;
             case "Player_Hitbox":
@@ -74,5 +75,11 @@ public class EnemyBulletScript : NetworkBehaviour
     private void InstantiateParticleEffectsClientRpc()
     {
         TriggerParticleEffects();
+    }
+
+    [ClientRpc]
+    private void InstantiateRicochetSfxClientRpc()
+    {
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.BulletRicochet, gameObject.transform.position);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,7 +20,7 @@ public class PauseMenu : MonoBehaviour
         quitButton = root.Q<Button>("QuitButton");
 
         resumeButton.RegisterCallback<ClickEvent>(OnClickResumeGame);
-        quitButton.RegisterCallback<ClickEvent>(QuitGame);
+        quitButton.RegisterCallback<ClickEvent>(QuitToMenu);
     }
 
     public void OpenPauseMenu()
@@ -40,8 +41,9 @@ public class PauseMenu : MonoBehaviour
     }
     
 
-    private void QuitGame(ClickEvent clickEvent)
+    private void QuitToMenu(ClickEvent clickEvent)
     {
-        Application.Quit();
+        NetworkManager.Singleton.Shutdown();
+        Loader.LoadScene(Loader.Scene.MainMenuScene);
     }
 }

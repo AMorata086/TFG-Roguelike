@@ -10,6 +10,8 @@ public class GameManager : NetworkBehaviour
     public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
+    public event EventHandler OnPlayerDeath;
+    public event EventHandler OnReachedGoal;
 
     // Define a simple state machine to control the current state
     public enum State
@@ -239,9 +241,6 @@ public class GameManager : NetworkBehaviour
                 SetWaitingToStartOverlayActiveStateClientRpc(false);
                 // things that should execute while playing
                 break;
-            case State.GameFinished:
-                // things that should execute upun Game Over
-                break;
         }
     }
 
@@ -249,5 +248,36 @@ public class GameManager : NetworkBehaviour
     private void SetWaitingToStartOverlayActiveStateClientRpc(bool isActive)
     {
         waitingToStartOverlay.SetActive(isActive);
+    }
+
+    public void SetGameFinishedState(bool isPlayerDeath)
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        currentState.Value = State.GameFinished;
+
+        if (isPlayerDeath)
+        {
+            InvokeOnPlayerDeathClientRpc();
+        }
+        else
+        {
+            InvokeOnReachedGoalClientRpc();
+        }
+    }
+
+    [ClientRpc]
+    private void InvokeOnPlayerDeathClientRpc()
+    {
+        OnPlayerDeath?.Invoke(this, EventArgs.Empty);
+    }
+
+    [ClientRpc]
+    private void InvokeOnReachedGoalClientRpc()
+    {
+        OnReachedGoal?.Invoke(this, EventArgs.Empty);
     }
 }

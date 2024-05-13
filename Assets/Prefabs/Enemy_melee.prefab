@@ -393,14 +393,14 @@ MonoBehaviour:
   HealthPoints: 10
   damage: 1
   knockbackForce: 1500
-  MovementSpeed: 2000
+  MovementSpeed: 2500
   Rb: {fileID: 4183626379812194677}
   Animator: {fileID: 8519871073452827978}
   deathVFX: {fileID: 8320190755773182064, guid: 7d398133259edd24db97d8376ebe36db, type: 3}
   explosionVFX: {fileID: 803975109124953716, guid: f31401f9e3cdee145be97946d18630be, type: 3}
   spawnEffect: {fileID: 8948650052214506691}
   NextWaypointDistance: 1
-  TargetDetectionDistance: 10
+  TargetDetectionDistance: 15
 --- !u!114 &5379955965228014434
 MonoBehaviour:
   m_ObjectHideFlags: 0

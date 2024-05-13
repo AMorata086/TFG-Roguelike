@@ -25,11 +25,13 @@ public class MainMenuUIScript : MonoBehaviour
 
     private void PlayOffline(ClickEvent clickEvent)
     {
-        //Loader.LoadScene(Loader.Scene.Level1Scene);
+        MultiplayerBehavior.playMultiplayer = false;
+        Loader.LoadScene(Loader.Scene.LobbyScene);
     }
 
     private void PlayOnline(ClickEvent clickEvent)
     {
+        MultiplayerBehavior.playMultiplayer = true;
         Loader.LoadScene(Loader.Scene.LobbyScene);
     }
 

@@ -182,14 +182,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerName: 
-  MovementSpeed: 3000
-  MaxHealthPoints: 10
-  Damage: 2
+  movementSpeed: 3000
+  maxHealthPoints: 10
+  damage: 2
   CanMove:
     m_InternalValue: 0
   dodgeStrength: 750
   Rb: {fileID: 7476635088602437103}
   Hand: {fileID: 2493990819836048051}
+  selfLight: {fileID: 2490711276802090998}
+  hitbox: {fileID: 8686410592217458179}
   ShootingPoint: {fileID: 1988089586125313239}
   BulletPrefab: {fileID: 5304640199730520428, guid: e6c5e8f68f67df6499b1d24507be6aa1, type: 3}
   BulletSpeed: 750

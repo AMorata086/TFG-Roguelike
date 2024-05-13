@@ -37,6 +37,10 @@ public class RoomManager : NetworkBehaviour
     [ClientRpc]
     private void DisableRoomColliderClientRpc()
     {
-        gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        BoxCollider2D[] colliders = gameObject.GetComponents<BoxCollider2D>();
+        foreach (BoxCollider2D collider in colliders)
+        {
+            collider.enabled = false;
+        }
     }
 }

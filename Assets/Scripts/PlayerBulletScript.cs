@@ -68,6 +68,7 @@ public class PlayerBulletScript : NetworkBehaviour
                 break;
             case "Environment":
                 TriggerParticleEffectsClientRpc();
+                InstantiateRicochetSfxClientRpc();
                 Destroy(gameObject);
                 break;
             case "Player":
@@ -75,10 +76,12 @@ public class PlayerBulletScript : NetworkBehaviour
                 break;
             case "Enemy_Projectile":
                 TriggerParticleEffectsClientRpc();
+                InstantiateRicochetSfxClientRpc();
                 Destroy(gameObject);
                 break;
             case "Health_Pack":
                 TriggerParticleEffectsClientRpc();
+                InstantiateRicochetSfxClientRpc();
                 HealthPackScript healthPackScript = collision.gameObject.GetComponent<HealthPackScript>();
                 if(healthPackScript == null)
                 {
@@ -124,5 +127,11 @@ public class PlayerBulletScript : NetworkBehaviour
         eAngles = new Vector3(-eAngles.z, 90, 0);
         ParticleSystem ImpactParticles = ParticleSystem.Instantiate(ImpactParticlesPrefab, gameObject.transform.position, Quaternion.Euler(eAngles));
         ImpactParticles.transform.localScale = new Vector3(1, 1, -1);
+    }
+
+    [ClientRpc]
+    private void InstantiateRicochetSfxClientRpc()
+    {
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.BulletRicochet, gameObject.transform.position);
     }
 }

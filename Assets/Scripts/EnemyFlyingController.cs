@@ -57,19 +57,28 @@ public class EnemyFlyingController : NetworkBehaviour
         bullet.GetComponent<EnemyBulletScript>().Damage = Damage;
         NetworkObject bulletGameObjectNetworkObject = bullet.GetComponent<NetworkObject>();
         bulletGameObjectNetworkObject.Spawn(true);
+        CallShootingFxClientRpc();
         lastShotTime = Time.time;
     }
+
+    [ClientRpc]
+    private void CallShootingFxClientRpc()
+    {
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.EnemyDroneShot, gameObject.transform.position);
+    }
+
 
     public void GetHurt(int damageReceived)
     {
         HealthPoints -= damageReceived;
-        InstantiateDamageVfxClientRpc();
+        InstantiateDamageFxClientRpc();
     }
 
     [ClientRpc]
-    private void InstantiateDamageVfxClientRpc()
+    private void InstantiateDamageFxClientRpc()
     {
         damageVFX.CallDamageEffect();
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.EnemyHurt, gameObject.transform.position);
     }
 
     private IEnumerator PerformSpawn()
@@ -89,16 +98,17 @@ public class EnemyFlyingController : NetworkBehaviour
         if (HealthPoints <= 0)
         {
             gameManager.DecrementCurrentEnemies();
-            InstantiateDeathVfxClientRpc();
+            InstantiateDeathFxClientRpc();
             Destroy(gameObject);
         }
     }
 
     [ClientRpc]
-    private void InstantiateDeathVfxClientRpc()
+    private void InstantiateDeathFxClientRpc()
     {
         ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
         ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.EnemyDies, gameObject.transform.position);
     }
 
     private Transform FindTarget()
@@ -195,8 +205,12 @@ public class EnemyFlyingController : NetworkBehaviour
         }
 
         distanceToTarget = Vector2.Distance(Rb.position, target.position);
-
-        if (distanceToTarget > MaxShootingDistance && distanceToTarget <= TargetDetectionDistance)
+        if (TargetDetectionDistance < distanceToTarget)
+        {
+            isChasingTarget = false;
+            isShooting = false;
+        }
+        else if ((MaxShootingDistance < distanceToTarget) && (distanceToTarget <= TargetDetectionDistance))
         {
             isChasingTarget = true;
             isShooting = false;
@@ -223,6 +237,7 @@ public class EnemyFlyingController : NetworkBehaviour
             return;
         }
 
+        
         if (currentWaypoint >= path.vectorPath.Count)
         {
             reachedEndOfPath = true;
@@ -232,6 +247,7 @@ public class EnemyFlyingController : NetworkBehaviour
         {
             reachedEndOfPath = false;
         }
+        
 
         if (isChasingTarget)
         {

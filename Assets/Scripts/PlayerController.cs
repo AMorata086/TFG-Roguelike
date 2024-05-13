@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 
 public class PlayerController : NetworkBehaviour
@@ -26,6 +27,8 @@ public class PlayerController : NetworkBehaviour
     public Rigidbody2D Rb;
 
     public GameObject Hand;
+    [SerializeField] private GameObject selfLight;
+    [SerializeField] private GameObject hitbox;
 
     public GameObject ShootingPoint;
     public GameObject BulletPrefab;
@@ -52,7 +55,6 @@ public class PlayerController : NetworkBehaviour
     private float lastShotTime = 0f;
 
     [SerializeField] private InGameUIScript interfaceScript;
-    [SerializeField] private SoundEffectManager soundEffectManager;
     [SerializeField] private GameObject pauseMenu;
 
     [SerializeField] private PlayerSpritesReferences playerSpritesReferences;
@@ -126,7 +128,7 @@ public class PlayerController : NetworkBehaviour
     private void SpawnShootingAudioAndVisualCuesClientRpc()
     {
         ParticleSystem.Instantiate(MuzzleFlash, ShootingPoint.transform.position, ShootingPoint.transform.rotation);
-        soundEffectManager.PlaySound(soundEffectManager.SFXRefs.PlayerShot, ShootingPoint.transform.position);
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.PlayerShot, ShootingPoint.transform.position);
     }
 
     public void GetHurt(int damageReceived)
@@ -147,17 +149,21 @@ public class PlayerController : NetworkBehaviour
 
     [ClientRpc]
     private void GetHurtClientRpc(int damageReceived)
-    {
+    {   
         currentHealthPoints -= damageReceived;
         damageVFX.CallDamageEffect();
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.PlayerHurt, gameObject.transform.position);
         Debug.Log(gameObject.tag + " current HP = " + currentHealthPoints);
         CallUpdateHealthBar();
+        if (currentHealthPoints <= 0)
+        {
+            PerformDeath();
+        }
     }
 
     public void Heal(int healthRestored)
     {
         int healthPointsAfterHealing = 0;
-        Debug.Log("Before healing: " + currentHealthPoints);
         // Control the health points not overflowing the Max Health value
         if ((((currentHealthPoints + healthRestored) % maxHealthPoints) == (currentHealthPoints + healthRestored)) ||
             (((currentHealthPoints + healthRestored) % maxHealthPoints) == 0))
@@ -177,16 +183,20 @@ public class PlayerController : NetworkBehaviour
     private void HealClientRpc(int healthPointsAfterHealing)
     {
         currentHealthPoints = healthPointsAfterHealing;
-        Debug.Log("After healing: " + currentHealthPoints);
     }
 
     private void PerformDeath()
     {
         if (currentHealthPoints <= 0)
         {
-            ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
-            Destroy(gameObject);
+            PerformDeathServerRpc();
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PerformDeathServerRpc()
+    {
+        GameManager.Instance.SetGameFinishedState(true);
     }
 
     void AnimatePlayer()
@@ -265,12 +275,40 @@ public class PlayerController : NetworkBehaviour
             
             playerControls.Player.Dodge.performed += SetPlayerReady;
             playerControls.Player.Pause.performed += TogglePauseMenu;
+            GameManager.Instance.OnPlayerDeath += GameManager_OnPlayerDeath;
+            GameManager.Instance.OnReachedGoal += GameManager_OnReachedGoal;
             playerControls.Player.Enable();
-
-            // NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         }
 
         base.OnNetworkSpawn();
+    }
+
+    private void GameManager_OnReachedGoal(object sender, EventArgs e)
+    {
+        SetPlayerDeathStateServerRpc();
+    }
+
+    private void GameManager_OnPlayerDeath(object sender, EventArgs e)
+    {
+        SetPlayerDeathStateServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerDeathStateServerRpc()
+    {
+        CanMove.Value = false;
+        SetPlayerDeathStateClientRpc();
+    }
+
+    [ClientRpc]
+    private void SetPlayerDeathStateClientRpc()
+    {
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        Hand.GetComponentInChildren<SpriteRenderer>().enabled = false;
+        selfLight.SetActive(false);
+        hitbox.SetActive(false);
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
@@ -286,7 +324,6 @@ public class PlayerController : NetworkBehaviour
     {
         damageVFX = GetComponent<DamageEffect>();
         pauseMenu = GameObject.Find("PauseMenuOverlay");
-        soundEffectManager = GameObject.Find("SoundManager").GetComponent<SoundEffectManager>();
         interfaceScript = GameObject.Find("User Interface").GetComponent<InGameUIScript>();
         if (!IsOwner)
         {
@@ -345,7 +382,6 @@ public class PlayerController : NetworkBehaviour
         AnimatePlayer();
         DisplaceCamera();
         AimWeapon();
-        //PerformDeath();
     }
 
     // FixedUpdate is called at a fixed rate, used for physics

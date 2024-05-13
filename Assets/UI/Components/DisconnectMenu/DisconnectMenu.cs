@@ -18,9 +18,9 @@ public class DisconnectMenu : MonoBehaviour
         VisualElement rootVisualElement = document.rootVisualElement;
         rootVisualElement.style.display = DisplayStyle.None;
         disconnectMenuLabel = rootVisualElement.Q<Label>("DisconnectMenuLabel");
-        quitToDesktopButton = rootVisualElement.Q<Button>("QuitToDesktopButton");
+        quitToDesktopButton = rootVisualElement.Q<Button>("QuitToMenuButton");
 
-        quitToDesktopButton.RegisterCallback<ClickEvent>(QuitGame);
+        quitToDesktopButton.RegisterCallback<ClickEvent>(QuitToMenu);
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
@@ -59,8 +59,9 @@ public class DisconnectMenu : MonoBehaviour
         document.rootVisualElement.style.display = DisplayStyle.Flex;
     }
 
-    private void QuitGame(ClickEvent evt)
+    private void QuitToMenu(ClickEvent evt)
     {
-        Application.Quit();
+        NetworkManager.Singleton.Shutdown();
+        Loader.LoadScene(Loader.Scene.MainMenuScene);
     }
 }

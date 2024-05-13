@@ -394,8 +394,8 @@ MonoBehaviour:
   HealthPoints: 4
   Damage: 1
   MovementSpeed: 3500
-  BulletSpeed: 500
-  ShootingCooldown: 0.5
+  BulletSpeed: 250
+  ShootingCooldown: 0.33
   MaxShootingDistance: 6
   BulletPrefab: {fileID: 9197752432398817892, guid: e9d3893df515c7a4f99c019ba0f528da, type: 3}
   Rb: {fileID: 110575459661948499}
@@ -405,7 +405,7 @@ MonoBehaviour:
   explosionVFX: {fileID: 803975109124953716, guid: f31401f9e3cdee145be97946d18630be, type: 3}
   spawnEffect: {fileID: 3989087684954840069}
   NextWaypointDistance: 1
-  TargetDetectionDistance: 15
+  TargetDetectionDistance: 20
 --- !u!114 &4317618801223915213
 MonoBehaviour:
   m_ObjectHideFlags: 0

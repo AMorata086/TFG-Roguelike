@@ -11,6 +11,8 @@ public class MultiplayerBehavior : NetworkBehaviour
 
     public static MultiplayerBehavior Instance { get; private set; }
 
+    public static bool playMultiplayer;
+
     public event EventHandler OnTryingToJoinGame;
     public event EventHandler OnFailedToJoinGame;
     public event EventHandler OnPlayerDataListChanged;
@@ -30,6 +32,15 @@ public class MultiplayerBehavior : NetworkBehaviour
 
         playerDataList = new NetworkList<PlayerData>();
         playerDataList.OnListChanged += PlayerDataList_OnListChanged;
+    }
+
+    private void Start()
+    {
+        if (!playMultiplayer)
+        {
+            StartHost();
+            Loader.NetworkLoadScene(Loader.Scene.Level1Scene);
+        }
     }
 
     public string GetPlayerName()

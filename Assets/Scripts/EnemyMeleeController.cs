@@ -45,13 +45,14 @@ public class EnemyMeleeController : NetworkBehaviour
         }
 
         HealthPoints -= damageReceived;
-        InstantiateDamageVfxClientRpc();
+        InstantiateDamageFxClientRpc();
     }
 
     [ClientRpc]
-    private void InstantiateDamageVfxClientRpc()
+    private void InstantiateDamageFxClientRpc()
     {
         damageVFX.CallDamageEffect();
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.EnemyHurt, gameObject.transform.position);
     }
 
     private IEnumerator PerformSpawn()
@@ -73,16 +74,17 @@ public class EnemyMeleeController : NetworkBehaviour
         if (HealthPoints <= 0)
         {
             gameManager.DecrementCurrentEnemies();
-            InstantiateDeathVfxClientRpc();
+            InstantiateDeathFxClientRpc();
             Destroy(gameObject);
         }
     }
 
     [ClientRpc]
-    private void InstantiateDeathVfxClientRpc()
+    private void InstantiateDeathFxClientRpc()
     {
         ParticleSystem.Instantiate(deathVFX, gameObject.transform.position, gameObject.transform.rotation);
         ParticleSystem.Instantiate(explosionVFX, gameObject.transform.position, gameObject.transform.rotation);
+        SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.EnemyDies, gameObject.transform.position);
     }
 
     private void AttackTarget(Collider2D collision)
@@ -253,6 +255,7 @@ public class EnemyMeleeController : NetworkBehaviour
             return;
         }
 
+        
         if (currentWaypoint >= path.vectorPath.Count)
         {
             reachedEndOfPath = true;
@@ -262,6 +265,7 @@ public class EnemyMeleeController : NetworkBehaviour
         {
             reachedEndOfPath = false;
         }
+        
 
         direction = ((Vector2)path.vectorPath[currentWaypoint] - Rb.position).normalized;
         Vector2 force = MovementSpeed * Time.deltaTime * direction;

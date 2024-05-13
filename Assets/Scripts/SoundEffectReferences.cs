@@ -10,4 +10,7 @@ public class SoundEffectReferences : ScriptableObject
     public AudioClip PlayerHurt;
     public AudioClip EnemyHurt;
     public AudioClip EnemyDies;
+    public AudioClip BulletRicochet;
+    public AudioClip DoorsOpening;
+    public AudioClip DoorsClosing;
 }

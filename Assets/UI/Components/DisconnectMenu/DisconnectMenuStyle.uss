@@ -1,7 +1,7 @@
 .MainContainer {
     -unity-font: url('project://database/Assets/Fonts/PixeloidSans.ttf?fileID=12800000&guid=a694a182bddd42a41b0aadbca2af91bc&type=3#PixeloidSans');
     -unity-font-definition: initial;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(26, 26, 26, 0.95);
     width: 100%;
     height: 100%;
     align-items: center;

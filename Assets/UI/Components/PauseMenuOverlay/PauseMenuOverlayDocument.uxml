@@ -1,11 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/Views/PauseMenuOverlay/PauseMenuOverlayUSS.uss?fileID=7433441132597879392&amp;guid=dd9fec42c76e45e43b8b23ecda348c69&amp;type=3#PauseMenuOverlayUSS" />
+    <Style src="project://database/Assets/UI/Components/PauseMenuOverlay/PauseMenuOverlayStyle.uss?fileID=7433441132597879392&amp;guid=dd9fec42c76e45e43b8b23ecda348c69&amp;type=3#PauseMenuOverlayStyle" />
     <ui:VisualElement name="MainContainer" tabindex="2" class="MainContainer">
         <ui:VisualElement name="VisualElement" class="PauseOptionsContainer">
             <ui:Label tabindex="-1" text="Pause Menu" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Label" class="PauseLabel" />
             <ui:VisualElement name="ButtonsContainer" class="ButtonsContainer">
                 <ui:Button text="Resume" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ResumeButton" class="PauseMenuButton" />
-                <ui:Button text="Quit to desktop" parse-escape-sequences="true" display-tooltip-when-elided="true" name="QuitButton" class="PauseMenuButton" />
+                <ui:Button text="Quit to Menu" parse-escape-sequences="true" display-tooltip-when-elided="true" name="QuitButton" class="PauseMenuButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

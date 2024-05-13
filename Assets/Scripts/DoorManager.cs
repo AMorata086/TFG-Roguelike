@@ -15,13 +15,13 @@ public class DoorManager : MonoBehaviour
         {
             doorsClosed.gameObject.SetActive(false);
             doorsOpen.gameObject.SetActive(true);
-            Debug.Log("Doors state changed to open.");
+            SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.DoorsOpening, gameObject.transform.position);
         } 
         else if(doorsOpen.gameObject.activeSelf)
         {
             doorsClosed.gameObject.SetActive(true);
             doorsOpen.gameObject.SetActive(false);
-            Debug.Log("Doors state changed to closed.");
+            SoundEffectManager.Instance.PlaySound(SoundEffectManager.Instance.SFXRefs.DoorsClosing, gameObject.transform.position);
         } 
     }
 }

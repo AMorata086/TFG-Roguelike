@@ -13,4 +13,7 @@
     -unity-font: url('project://database/Assets/Fonts/PixeloidSans.ttf?fileID=12800000&guid=a694a182bddd42a41b0aadbca2af91bc&type=3#PixeloidSans');
     -unity-font-definition: initial;
     font-size: 20px;
+    -unity-text-align: middle-center;
+    margin-top: 2.5%;
+    margin-bottom: 2.5%;
 }

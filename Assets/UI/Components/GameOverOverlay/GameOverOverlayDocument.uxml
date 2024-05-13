@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Components/GameOverOverlay/GameOverOverlayStyle.uss?fileID=7433441132597879392&amp;guid=9e99a3a4f3003be4fa5832ef2cd3e1a8&amp;type=3#GameOverOverlayStyle" />
+    <ui:VisualElement name="MainContainer" class="MainContainer">
+        <ui:VisualElement name="GameOverContainer" class="GameOverContainer">
+            <ui:Label tabindex="-1" text="GAME OVER" parse-escape-sequences="true" display-tooltip-when-elided="true" name="GameOverLabel" class="GameOverLabel" style="width: 100%; height: 25%;" />
+            <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="SubtextLabel" class="SubtextLabel" />
+            <ui:VisualElement name="ButtonsContainer" class="ButtonsContainer">
+                <ui:Button text="Quit to Menu" parse-escape-sequences="true" display-tooltip-when-elided="true" name="QuitToMenuButton" class="Button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -6,7 +6,7 @@
     justify-content: center;
     align-items: center;
     -unity-font-style: normal;
-    background-color: rgb(5, 5, 5);
+    background-color: rgb(26, 26, 26);
 }
 
 .TitleContainer {
@@ -34,7 +34,7 @@
 .MenuButton {
     height: 30%;
     width: 30%;
-    background-color: rgb(5, 5, 5);
+    background-color: rgb(26, 26, 26);
     font-size: 20px;
     -unity-font-style: normal;
     color: rgb(231, 231, 231);
@@ -62,7 +62,11 @@
     width: 100%;
     height: 30%;
     color: rgb(27, 27, 27);
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(229, 229, 229);
+    border-left-color: rgb(229, 229, 229);
+    border-right-color: rgb(229, 229, 229);
+    border-top-color: rgb(229, 229, 229);
+    border-bottom-color: rgb(229, 229, 229);
 }
 
 .FooterContainer {
