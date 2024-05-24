@@ -1,5 +1,4 @@
 * {
-    cursor: url('project://database/Assets/Sprites/crosshair.png?fileID=2800000&guid=124b63369f293aa47a5cac25f62179cf&type=3#crosshair');
     -unity-font: url('project://database/Assets/Fonts/PixeloidSans.ttf?fileID=12800000&guid=a694a182bddd42a41b0aadbca2af91bc&type=3#PixeloidSans');
 }
 
@@ -9,7 +8,6 @@
     -unity-font-definition: initial;
     font-size: 14px;
     -unity-font-style: normal;
-    cursor: url('project://database/Assets/Sprites/crosshair.png?fileID=2800000&guid=124b63369f293aa47a5cac25f62179cf&type=3#crosshair');
 }
 
 .PlayerInfo {

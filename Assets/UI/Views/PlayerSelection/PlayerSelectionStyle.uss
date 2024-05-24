@@ -27,7 +27,6 @@
     border-bottom-color: rgb(0, 250, 255);
     transition-duration: 0.25s;
     transition-timing-function: ease-out;
-    cursor: url('project://database/Assets/Sprites/crosshair.png?fileID=2800000&guid=124b63369f293aa47a5cac25f62179cf&type=3#crosshair');
 }
 
 .Button:hover {

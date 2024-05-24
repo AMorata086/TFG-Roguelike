@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/Styles/MainMenuUSS.uss?fileID=7433441132597879392&amp;guid=1ef47492e350d7c4fafe163580984d66&amp;type=3#MainMenuUSS" />
+    <Style src="project://database/Assets/UI/Views/MainMenu/MainMenuStyle.uss?fileID=7433441132597879392&amp;guid=1ef47492e350d7c4fafe163580984d66&amp;type=3#MainMenuStyle" />
     <ui:VisualElement name="MainContainer" class="MainContainer" style="flex-grow: 1;">
         <ui:VisualElement name="TitleContainer" class="TitleContainer">
-            <ui:Label tabindex="-1" text="PLACEHOLDER TITLE" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+            <ui:Label tabindex="-1" text="EXO-STATION ZERO" parse-escape-sequences="true" display-tooltip-when-elided="true" />
         </ui:VisualElement>
         <ui:VisualElement name="ButtonsContainer" class="ButtonsContainer">
             <ui:Button text="Single Player" parse-escape-sequences="true" display-tooltip-when-elided="true" name="SinglePlayerButton" class="MenuButton" />
