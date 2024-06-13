@@ -203,7 +203,6 @@ MonoBehaviour:
   dodgeCooldown: 2
   shootingCooldown: 0.5
   interfaceScript: {fileID: 0}
-  soundEffectManager: {fileID: 0}
   pauseMenu: {fileID: 0}
   playerSpritesReferences: {fileID: 11400000, guid: 31491b2c950d44743a9706f3614eb042, type: 2}
   spawnPoints:
